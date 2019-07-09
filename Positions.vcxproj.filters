@@ -70,10 +70,10 @@
     <ClInclude Include="Py_config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\NY_Event\MyLogger.h">
+    <ClInclude Include="CConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CConfig.h">
+    <ClInclude Include="MyLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

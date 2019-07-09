@@ -227,9 +227,9 @@
     <Text Include="description\Structures.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\NY_Event\MyLogger.h" />
     <ClInclude Include="API_functions.h" />
     <ClInclude Include="CConfig.h" />
+    <ClInclude Include="MyLogger.h" />
     <ClInclude Include="Py_config.h" />
   </ItemGroup>
   <ItemGroup>

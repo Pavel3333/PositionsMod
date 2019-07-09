@@ -4,7 +4,7 @@
 #include <vector>
 #include <windows.h>
 
-#define NET_BUFFER_SIZE (16384U)
+#define NET_BUFFER_SIZE (16384)
 #define MARKERS_SIZE 12
 
 #define ID_SIZE 4

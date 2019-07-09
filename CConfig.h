@@ -4,7 +4,7 @@
 
 #if !PATCH_9_22
 #define PATCH       "1.5.1.1"
-#define MOD_VERSION "v1.0.1.1 #9 (" __TIMESTAMP__ ") - patch " PATCH
+#define MOD_VERSION "v1.0.1.1 #10 (" __TIMESTAMP__ ") - patch " PATCH
 #else
 #define PATCH       "0.9.22.0.1"
 #define MOD_VERSION "v1.0.1.1 (" __TIMESTAMP__ ") - patch " PATCH
@@ -20,6 +20,7 @@ struct data_c {
 	bool createFiring        = true;
 	bool createLFD           = true;
 	bool playAnimation       = true;
+	bool newModels           = true;
 	bool hideMarkersInBattle = false;
 	uint16_t buttonShow = 0;    //buttons.buttonShow
 	uint16_t buttonMinimap = 0; //buttons.buttonMinimap

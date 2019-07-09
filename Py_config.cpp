@@ -133,6 +133,13 @@ PyObject* init_data() {
 		goto end_init_data;
 	}
 
+	PyObject* data_newModels = PyBool_FromLong(Config::data.newModels);
+
+	if (PyDict_SetItemString(data, "newModels", data_newModels)) {
+		Py_DECREF(data_newModels);
+		goto end_init_data;
+	}
+
 	PyObject* data_hideMarkersInBattle = PyBool_FromLong(Config::data.hideMarkersInBattle);
 
 	if (PyDict_SetItemString(data, "hideMarkersInBattle", data_hideMarkersInBattle)) {
@@ -170,6 +177,7 @@ PyObject* init_i18n() {
 	PyObject* UI_setting_createFiring_text = PyString_FromString("Create firing positions");
 	PyObject* UI_setting_createLFD_text = PyString_FromString("Create LFD positions");
 	PyObject* UI_setting_playAnimation_text = PyString_FromString("Play animation");
+	PyObject* UI_setting_newModels_text = PyString_FromString("New models");
 	PyObject* UI_message_thx = PyString_FromString("Positions Mod: Loaded 758 positions.");
 	PyObject* UI_message_thx_2 = PyString_FromString("Official site of Positions mod");
 	PyObject* UI_message_channel = PyString_FromString("Official channel RAINN VOD of Positions mod");
@@ -205,6 +213,8 @@ PyObject* init_i18n() {
 		PyDict_SetItemString(i18n, "UI_setting_createLFD_tooltip", empty_tooltip) ||
 		PyDict_SetItemString(i18n, "UI_setting_playAnimation_text", UI_setting_playAnimation_text) ||
 		PyDict_SetItemString(i18n, "UI_setting_playAnimation_tooltip", empty_tooltip) ||
+		PyDict_SetItemString(i18n, "UI_setting_newModels_text", UI_setting_newModels_text) ||
+		PyDict_SetItemString(i18n, "UI_setting_newModels_tooltip", empty_tooltip) ||
 		PyDict_SetItemString(i18n, "UI_message_thx", UI_message_thx) ||
 		PyDict_SetItemString(i18n, "UI_message_thx_2", UI_message_thx_2) ||
 		PyDict_SetItemString(i18n, "UI_message_channel", UI_message_channel) ||
