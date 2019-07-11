@@ -9,6 +9,7 @@
 
 #include "MyLogger.h"
 
+#include <memory>
 #include <queue>
 
 INIT_LOCAL_MSG_BUFFER;
@@ -18,6 +19,8 @@ INIT_LOCAL_MSG_BUFFER;
 #define CREATE_MARKERS true
 
 #define NEW_MINIMAP_MARKERS true
+
+static PyObject* pos_light(float coords[3], uint8_t signType);
 
 #if CREATE_MODELS
 typedef struct {
@@ -34,12 +37,35 @@ std::vector<ModModel*> models;
 #endif
 
 #if CREATE_LIGHTS
-typedef struct {
-	PyObject* light = nullptr;
-	float* coords   = nullptr;
-} ModLight;
+struct ModLight {
+	ModLight(float coords[3], uint8_t signType);
+	~ModLight();
+	PyObject* light;
+	float* coords;
+};
 
-std::vector<ModLight*> lights;
+ModLight::ModLight(float coords[3], uint8_t signType)
+	: light(nullptr)
+	, coords(coords)
+{
+	this->light  = pos_light(coords, signType);
+}
+
+ModLight::~ModLight()
+{
+#if !PATCH_9_22
+	if (light && light != Py_None) {
+		if (PyObject* result_light = PyObject_CallMethod(light, "destroyLight", NULL)) Py_DECREF(result_light);
+	}
+#endif
+
+	Py_XDECREF(light);
+
+	light  = nullptr;
+	coords = nullptr;
+}
+
+std::vector<std::shared_ptr<ModLight>> lights;
 #endif
 
 #if !PATCH_9_22
@@ -60,8 +86,8 @@ PyObject* json = nullptr;
 uint8_t mapID       = NULL;
 uint32_t databaseID = NULL;
 
-uint8_t first_check = 100U;
-uint32_t request    = 100U;
+uint8_t first_check = 100;
+uint32_t request    = 100;
 
 double height_offset = 0.0;
 
@@ -78,7 +104,7 @@ bool flag = false;
 bool isModpack() { traceLog
 	char path[50];
 
-	sprintf_s(path, 50U, "./mods/%s/piranhas.mod_pack.wotmod", Config::patch);
+	sprintf_s(path, 50, "./mods/%s/piranhas.mod_pack.wotmod", Config::patch);
 
 	return file_exists(path);
 }
@@ -492,7 +518,7 @@ uint8_t create_models() { traceLog
 #endif
 
 #if CREATE_LIGHTS
-	lights.~vector();
+	lights.clear();
 #endif
 
 	for (uint8_t i = NULL; i < current_map.minimap_count; i++) {
@@ -584,12 +610,7 @@ uint8_t create_models() { traceLog
 #endif
 
 #if CREATE_LIGHTS
-				ModLight* light = new ModLight {
-					pos_light(*it, 1),
-					*it
-				};
-
-				lights.push_back(light);
+				if (!isNewModels) lights.push_back(std::make_shared<ModLight>(*it, 1));
 #endif
 
 				counter_model++;
@@ -642,12 +663,7 @@ uint8_t create_models() { traceLog
 #endif
 
 #if CREATE_LIGHTS
-				ModLight* light = new ModLight{
-					pos_light(*it, 2),
-					*it
-				};
-
-				lights.push_back(light);
+				if (!isNewModels) lights.push_back(std::make_shared<ModLight>(*it, 2));
 #endif
 
 				counter_model++;
@@ -702,12 +718,7 @@ uint8_t create_models() { traceLog
 #endif
 
 #if CREATE_LIGHTS
-				ModLight* light = new ModLight{
-					pos_light(*it, 3),
-					*it
-				};
-
-				lights.push_back(light);
+				if (!isNewModels) lights.push_back(std::make_shared<ModLight>(*it, 3));
 #endif
 
 				counter_model++;
@@ -1563,35 +1574,7 @@ static PyObject* pos_fini(PyObject *self, PyObject *args) { traceLog
 	request = NULL;
 
 #if CREATE_LIGHTS
-	auto it2 = lights.begin();
-	while (it2 != lights.end()) { traceLog
-		ModLight* light = *it2;
-
-	    if (light == nullptr)
-			goto end_cycle_pos_fini_2;
-
-#if !PATCH_9_22
-		if (light->light && light->light != Py_None) { traceLog
-			if (PyObject* result_light = PyObject_CallMethod(light->light, "destroyLight", NULL)) { traceLog
-				Py_DECREF(result_light);
-			}
-		} traceLog
-#endif
-
-		Py_XDECREF(light->light);
-
-		light->light  = nullptr;
-		light->coords = nullptr;
-
-		traceLog
-
-		delete light;
-		light = nullptr;
-end_cycle_pos_fini_2: traceLog
-		it2 = lights.erase(it2);
-	} traceLog
-
-	lights.~vector();
+	lights.clear();
 #endif
 
 	uint8_t delete_models = del_models();
