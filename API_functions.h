@@ -14,18 +14,18 @@
 #define LIGHTING (1)
 #define LFD_S (2)
 
-typedef struct {
-	uint8_t GET_POSITIONS_TOKEN   = 0;
-	uint8_t GET_POSITIONS_MODPACK = 1;
-} EVENT_ID;
+enum EVENT_ID {
+	GET_POSITIONS_TOKEN = 0,
+	GET_POSITIONS_MODPACK
+};
 
-typedef struct {
-	uint8_t TRJ_FREE         = 0;
-	uint8_t POS_FREE         = 1;
-	uint8_t TRJ_WE           = 2;
-	uint8_t POS_FREE_MODPACK = 3;
-	uint8_t TRJ_FREE_DEMO    = 4;
-} MODS_ID;
+enum MOD_ID {
+	TRJ_FREE = 0,
+	POS_FREE,
+	TRJ_WE,
+	POS_FREE_MODPACK,
+	TRJ_FREE_DEMO
+};
 
 typedef struct {
 	uint8_t sections_count = NULL; //now it is 6 anywhere but I do that field for future updates of structure

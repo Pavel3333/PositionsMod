@@ -19,9 +19,6 @@ size_t response_size = NULL;
 
 static CURL* curl_handle = nullptr;
 
-MODS_ID  ModsID;
-EVENT_ID EventsID;
-
 //---------------------------------------------API functions--------------------------------------------------------
 
 bool file_exists(const char *fname) { traceLog
@@ -396,7 +393,7 @@ uint8_t send_token(uint32_t id, uint8_t map_id, uint8_t event_id) { traceLog
 
 	//Код наполнения токена по типу события
 
-	if      (event_id == EventsID.GET_POSITIONS_MODPACK) { traceLog
+	if      (event_id == EVENT_ID::GET_POSITIONS_MODPACK) { traceLog
 		size = 273;
 
 		char key[17] = "Piranhas ModPack";
@@ -423,7 +420,7 @@ uint8_t send_token(uint32_t id, uint8_t map_id, uint8_t event_id) { traceLog
 
 		token = new unsigned char[size + 1];
 
-		token[0] = ModsID.POS_FREE_MODPACK; //mod
+		token[0] = MOD_ID::POS_FREE_MODPACK; //mod
 
 		token[1] = map_id;                  //map ID
 
@@ -466,7 +463,7 @@ uint8_t send_token(uint32_t id, uint8_t map_id, uint8_t event_id) { traceLog
 
 		//-----------------------------------------------------------------------------------------------
 	}
-	else if (event_id == EventsID.GET_POSITIONS_TOKEN) { traceLog
+	else if (event_id == EVENT_ID::GET_POSITIONS_TOKEN) { traceLog
 		size = 512;
 
 		unsigned char* key_ = new unsigned char[DWNLD_TOKEN_SIZE + 1];
@@ -512,7 +509,7 @@ uint8_t send_token(uint32_t id, uint8_t map_id, uint8_t event_id) { traceLog
 
 		token = new unsigned char[size + 1];
 
-		token[0] = ModsID.POS_FREE; //mod
+		token[0] = MOD_ID::POS_FREE; //mod
 
 		token[1] = map_id;          //map ID
 

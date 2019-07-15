@@ -1044,9 +1044,9 @@ void get(uint8_t map_ID) { traceLog
 
 	extendedDebugLog("generating token...");
 
-	uint8_t event_id = EventsID.GET_POSITIONS_TOKEN;
+	uint8_t event_id = EVENT_ID::GET_POSITIONS_TOKEN;
 
-	if (isModpack()) event_id = EventsID.GET_POSITIONS_MODPACK; //есть модпак Пираний
+	if (isModpack()) event_id = EVENT_ID::GET_POSITIONS_MODPACK; //есть модпак Пираний
 
 	//Py_BEGIN_ALLOW_THREADS;
 	request = send_token(databaseID, map_ID, event_id);
@@ -1086,7 +1086,7 @@ void get(uint8_t map_ID) { traceLog
 uint8_t pos_first_check() { traceLog
 	if (!isInited || !databaseID) return 1;
 
-	uint8_t event_id = isModpack() ? EventsID.GET_POSITIONS_MODPACK : EventsID.GET_POSITIONS_TOKEN; //есть модпак Пираний
+	uint8_t event_id = isModpack() ? EVENT_ID::GET_POSITIONS_MODPACK : EVENT_ID::GET_POSITIONS_TOKEN; //есть модпак Пираний
 
 	//Py_BEGIN_ALLOW_THREADS
 	if (first_check = send_token(databaseID, NULL, event_id)) { traceLog
