@@ -2,9 +2,9 @@
 
 #define debug_log                true
 #define extended_debug_log       true
-#define super_extended_debug_log true
+#define super_extended_debug_log false
 
-#define trace_log true
+#define trace_log false
 
 #define MAX_DBG_LINE_SIZE 1024
 #define MAX_DBG_TIME_SIZE 64
