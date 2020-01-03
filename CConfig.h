@@ -3,8 +3,8 @@
 #include <cstdint>
 
 #if !PATCH_9_22
-#define PATCH       "1.6.1.0"
-#define MOD_VERSION "v1.0.1.2 (" __TIMESTAMP__ ") - patch " PATCH
+#define PATCH       "1.7.0.2"
+#define MOD_VERSION "v1.0.1.4 (" __TIMESTAMP__ ") - patch " PATCH
 #else
 #define PATCH       "0.9.22.0.1"
 #define MOD_VERSION "v1.0.1.1 (" __TIMESTAMP__ ") - patch " PATCH
@@ -23,7 +23,7 @@ struct data_c {
 	bool newModels           = true;
 	bool hideMarkersInBattle = false;
 	uint16_t buttonShow = 0;    //buttons.buttonShow
-	uint16_t buttonMinimap = 0; //buttons.buttonMinimap
+	uint16_t buttonMinimap = 0; // buttons.buttonMinimap
 };
 
 struct buttons_c {

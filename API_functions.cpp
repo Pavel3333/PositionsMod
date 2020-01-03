@@ -227,7 +227,7 @@ static uint8_t send_to_server(std::string_view request)
 	curl_easy_setopt(curl_handle, CURLOPT_CAPATH, "/");
 
 	// setting CA cert info
-	curl_easy_setopt(curl_handle, CURLOPT_CAINFO, "res_mods/mods/xfw_packages/" MOD_NAME "/native/cacert.pem");
+	curl_easy_setopt(curl_handle, CURLOPT_CAINFO, "./res_mods/mods/xfw_packages/" MOD_NAME "/native_32bit/cacert.pem");
 
 	// setting function for write data
 	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_data);

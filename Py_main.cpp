@@ -106,7 +106,7 @@ bool flag = false;
 bool isModpack() { traceLog
 	char path[50];
 
-	sprintf_s(path, 50, "../mods/%s/piranhas.mod_pack.wotmod", Config::patch);
+	sprintf_s(path, 50, "./mods/%s/piranhas.mod_pack.wotmod", Config::patch);
 
 	return file_exists(path);
 }
@@ -162,12 +162,12 @@ bool read_data(bool isData) { traceLog
 	char* data_path;
 	PyObject* data_src;
 	if (isData) { traceLog 
-		data_path = "../mods/configs/pavel3333/" MOD_NAME "/" MOD_NAME ".json";
+		data_path = "./mods/configs/pavel3333/" MOD_NAME "/" MOD_NAME ".json";
 		data_src = g_self->data;
 	}
 	else { traceLog
 		data_src = g_self->i18n;
-		data_path = "../mods/configs/pavel3333/" MOD_NAME "/i18n/ru.json";
+		data_path = "./mods/configs/pavel3333/" MOD_NAME "/i18n/ru.json";
 	}
 
 	std::ifstream data(data_path, std::ios::binary);
@@ -1834,9 +1834,17 @@ static struct PyMethodDef pos_methods[] =
 
 PyMODINIT_FUNC initpos(void)
 {
-	LoadLibraryA("../res_mods/mods/xfw_packages/" MOD_NAME "/native/libeay32.dll");
-	LoadLibraryA("../res_mods/mods/xfw_packages/" MOD_NAME "/native/ssleay32.dll");
-	LoadLibraryA("../res_mods/mods/xfw_packages/" MOD_NAME "/native/libcurl.dll");
+	HINSTANCE dllLoadRes = NULL;
+
+	dllLoadRes = LoadLibraryA("./res_mods/mods/xfw_packages/" MOD_NAME "/native_32bit/libeay32.dll");
+	dllLoadRes = LoadLibraryA("./res_mods/mods/xfw_packages/" MOD_NAME "/native_32bit/ssleay32.dll");
+	dllLoadRes = LoadLibraryA("./res_mods/mods/xfw_packages/" MOD_NAME "/native_32bit/libcurl.dll");
+
+	if (!dllLoadRes) {
+		debugLogEx(ERROR, "initevent - error while loading DLLs");
+
+		goto end_initpos_1;
+	}
 
 	if (auto err = curl_init()) { traceLog
 		debugLogEx(ERROR, "initevent - curl_init: error %d", err);
@@ -1931,7 +1939,7 @@ PyMODINIT_FUNC initpos(void)
 	if (!imp)
 		goto end_initpos_2;
 
-	PyObject* Minimap_module = PyObject_CallMethod(imp, "load_dynamic", "ss", "Minimap", "../res_mods/mods/xfw_packages/" MOD_NAME "/native/Minimap.pyd", NULL);
+	PyObject* Minimap_module = PyObject_CallMethod(imp, "load_dynamic", "ss", "Minimap", "./res_mods/mods/xfw_packages/" MOD_NAME "/native_32bit/Minimap.pyd", NULL);
 	if (!Minimap_module)
 		goto end_initpos_2;
 
@@ -1982,10 +1990,10 @@ PyMODINIT_FUNC initpos(void)
 	traceLog
 
 	if (!g_gui) { traceLog
-		_mkdir("../mods/configs");
-		_mkdir("../mods/configs/pavel3333");
-		_mkdir("../mods/configs/pavel3333/" MOD_NAME);
-		_mkdir("../mods/configs/pavel3333/" MOD_NAME "/i18n");
+		_mkdir("./mods/configs");
+		_mkdir("./mods/configs/pavel3333");
+		_mkdir("./mods/configs/pavel3333/" MOD_NAME);
+		_mkdir("./mods/configs/pavel3333/" MOD_NAME "/i18n");
 
 		if (!read_data(true) || !read_data(false))
 			goto end_initpos_3;
