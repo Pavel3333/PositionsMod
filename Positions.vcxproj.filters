@@ -19,6 +19,9 @@
     <Filter Include="dll">
       <UniqueIdentifier>{7158c383-0bd1-48e5-a6a8-4380a04e37fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lib\Win32">
+      <UniqueIdentifier>{f916f30c-3313-4496-9c7b-328c48c0128a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="API_functions.cpp">
@@ -57,8 +60,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="lib\libcurl.lib">
-      <Filter>lib</Filter>
+    <Library Include="lib\Win32\python27.lib">
+      <Filter>lib\Win32</Filter>
+    </Library>
+    <Library Include="lib\Win32\libcurl.lib">
+      <Filter>lib\Win32</Filter>
     </Library>
   </ItemGroup>
 </Project>
