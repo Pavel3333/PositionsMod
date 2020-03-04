@@ -178,7 +178,7 @@ PyObject* init_i18n() {
 	PyObject* UI_setting_createLFD_text = PyString_FromString("Create LFD positions");
 	PyObject* UI_setting_playAnimation_text = PyString_FromString("Play animation");
 	PyObject* UI_setting_newModels_text = PyString_FromString("New models");
-	PyObject* UI_message_thx = PyString_FromString("Positions Mod: Loaded 758 positions.");
+	PyObject* UI_message_thx = PyString_FromString("Positions Mod: Loaded 832 positions.");
 	PyObject* UI_message_thx_2 = PyString_FromString("Official site of Positions mod");
 	PyObject* UI_message_channel = PyString_FromString("Official channel RAINN VOD of Positions mod");
 	PyObject* UI_message_trj_ad = PyString_FromString("Like Positions Mod? ");

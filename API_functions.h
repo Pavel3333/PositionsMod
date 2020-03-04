@@ -1,8 +1,11 @@
 #pragma once
+
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
 #include "iostream"
 #include <fstream>
 #include <vector>
-#include <windows.h>
 
 #define NET_BUFFER_SIZE (16384)
 #define MARKERS_SIZE 12

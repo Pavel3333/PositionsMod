@@ -185,7 +185,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>PATCH_9_22=false;Py_BUILD_CORE_MODULE;WIN32;NDEBUG;MOD_NAME="PositionsMod";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\WoTPython\$(Platform)\include\;$(ProjectDir)$(Platform)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\WoTPython\$(Platform)\include\;$(ProjectDir)include\$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <StringPooling>true</StringPooling>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -196,7 +196,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(ProjectDir)$(Platform)\lib\;C:\WoTPython\$(Platform)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;C:\WoTPython\$(Platform)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EnableUAC>false</EnableUAC>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -210,7 +210,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>PATCH_9_22=false;Py_BUILD_CORE_MODULE;WIN32;NDEBUG;MOD_NAME="PositionsMod";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\WoTPython\$(Platform)\include\;$(ProjectDir)$(Platform)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\WoTPython\$(Platform)\include\;$(ProjectDir)include\$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <StringPooling>true</StringPooling>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -220,7 +220,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(ProjectDir)$(Platform)\lib\;C:\WoTPython\$(Platform)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;C:\WoTPython\$(Platform)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EnableUAC>false</EnableUAC>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -230,13 +230,13 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level2</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>PATCH_9_22=false;Py_BUILD_CORE_MODULE;WIN32;NDEBUG;MOD_NAME="PositionsMod";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\WoTPython\include\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\WoTPython\$(Platform)\include\;$(ProjectDir)include\$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <StringPooling>true</StringPooling>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -246,7 +246,7 @@
       </EnableCOMDATFolding>
       <OptimizeReferences>
       </OptimizeReferences>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\;C:\WoTPython\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;C:\WoTPython\$(Platform)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libcurl.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EnableUAC>false</EnableUAC>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -262,13 +262,13 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level2</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>PATCH_9_22=false;Py_BUILD_CORE_MODULE;WIN32;NDEBUG;MOD_NAME="PositionsMod";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\WoTPython\include\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\WoTPython\$(Platform)\include\;$(ProjectDir)include\$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <StringPooling>true</StringPooling>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -278,7 +278,7 @@
       </EnableCOMDATFolding>
       <OptimizeReferences>
       </OptimizeReferences>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\;C:\WoTPython\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\;C:\WoTPython\$(Platform)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libcurl.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EnableUAC>false</EnableUAC>
       <GenerateDebugInformation>true</GenerateDebugInformation>

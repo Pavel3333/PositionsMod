@@ -2,8 +2,14 @@
 #include "API_functions.h"
 
 #include "CConfig.h"
+
+#pragma warning(push)
+#pragma warning(disable: 5033)
+
 #include "python2.7/Python.h"
 #include "python2.7/structmember.h"
+
+#pragma warning(pop)
 
 typedef struct {
 	PyObject_HEAD

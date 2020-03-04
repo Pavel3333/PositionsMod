@@ -1,7 +1,9 @@
 # -*- coding: cp1251 -*-
 import json
 from struct import pack
-from os import listdir
+from shutil import rmtree
+from os import listdir, mkdir, remove
+from os.path import exists
 
 ENCODE = True
 
@@ -13,6 +15,14 @@ trj_summary_count = 0
 firing = 0
 lighting = 0
 LFD = 0
+
+out_wd = './output/'
+if not exists(out_wd):
+    mkdir(out_wd)
+else:
+    for filename in listdir(out_wd):
+        remove(out_wd + filename)
+
 
 for _map in listdir('./input/'):
     models_count = 0
@@ -87,7 +97,7 @@ for _map in listdir('./input/'):
         
         fin = pack('<H', len(fil_bytes) + 2) + fin
         
-        with open('./output/' + _map.replace('json', 'bin'), 'wb') as fil:
+        with open(out_wd + _map.replace('json', 'bin'), 'wb') as fil:
             fil.write(fin)
         #with open('./output/' + _map.replace('.json', '_decoded.bin'), 'wb') as fil:
         #    fil.write(pack('<H', len(fil_bytes) + 2) + fil_bytes)

@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #define debug_log                true
-#define extended_debug_log       true
+#define extended_debug_log       false
 #define super_extended_debug_log false
 
 #define trace_log false
