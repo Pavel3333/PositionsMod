@@ -1688,7 +1688,7 @@ static PyObject* pos_init(PyObject *self, PyObject *args) { traceLog
 	PyObject* byteify;
 
 	if (!PyArg_ParseTuple(args, "OOO", &template_, &apply, &byteify)) { traceLog
-		PyInt_FromSize_t(2);
+		return PyInt_FromSize_t(2);
 	}
 
 	if (g_gui && PyCallable_Check(template_) && PyCallable_Check(apply)) { traceLog
@@ -1834,13 +1834,13 @@ static struct PyMethodDef pos_methods[] =
 
 PyMODINIT_FUNC initpos(void)
 {
-	HINSTANCE dllLoadRes = NULL;
+	HINSTANCE dllLoadRes1, dllLoadRes2, dllLoadRes3;
 
-	dllLoadRes = LoadLibraryA("./res_mods/mods/xfw_packages/" MOD_NAME "/native_32bit/libeay32.dll");
-	dllLoadRes = LoadLibraryA("./res_mods/mods/xfw_packages/" MOD_NAME "/native_32bit/ssleay32.dll");
-	dllLoadRes = LoadLibraryA("./res_mods/mods/xfw_packages/" MOD_NAME "/native_32bit/libcurl.dll");
+	dllLoadRes1 = LoadLibraryA("./res_mods/mods/xfw_packages/" MOD_NAME "/native_32bit/libeay32.dll");
+	dllLoadRes2 = LoadLibraryA("./res_mods/mods/xfw_packages/" MOD_NAME "/native_32bit/ssleay32.dll");
+	dllLoadRes3 = LoadLibraryA("./res_mods/mods/xfw_packages/" MOD_NAME "/native_32bit/libcurl.dll");
 
-	if (!dllLoadRes) {
+	if (!dllLoadRes1 || !dllLoadRes2 || !dllLoadRes3) {
 		debugLogEx(ERROR, "initevent - error while loading DLLs");
 
 		goto end_initpos_1;

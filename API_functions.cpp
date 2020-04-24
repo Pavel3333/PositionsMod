@@ -1,7 +1,4 @@
-﻿// ConsoleApplication2.cpp: определяет точку входа для консольного приложения.
-//
-
-#include "API_functions.h"
+﻿#include "API_functions.h"
 
 #include "CConfig.h"
 

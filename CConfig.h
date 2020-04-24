@@ -3,7 +3,7 @@
 #include <cstdint>
 
 #if !PATCH_9_22
-#define PATCH       "1.8.0.0"
+#define PATCH       "1.9.0.1"
 #define MOD_VERSION "v1.0.1.5 (" __TIMESTAMP__ ") - patch " PATCH
 #else
 #define PATCH       "0.9.22.0.1"
