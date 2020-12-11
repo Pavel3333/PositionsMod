@@ -3,15 +3,15 @@
 #include <cstdint>
 
 #if !PATCH_9_22
-#define PATCH       "1.9.0.1"
-#define MOD_VERSION "v1.0.1.5 (" __TIMESTAMP__ ") - patch " PATCH
+#define PATCH       "1.11.0.0"
+#define MOD_VERSION "v2.0.0.2 (" __TIMESTAMP__ ") - patch " PATCH
 #else
 #define PATCH       "0.9.22.0.1"
 #define MOD_VERSION "v1.0.1.1 (" __TIMESTAMP__ ") - patch " PATCH
 #endif
 
 struct data_c {
-	uint16_t version = 0; //version_id
+	uint16_t version = 0;  //version_id
 	bool enabled             = true;
 	bool showOnStartBattle   = true;
 	bool showBattleGreetings = true;

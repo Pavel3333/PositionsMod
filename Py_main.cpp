@@ -9,10 +9,18 @@
 
 #include "MyLogger.h"
 
+#include <array>
+#include <string>
 #include <memory>
 #include <queue>
 
 INIT_LOCAL_MSG_BUFFER;
+
+std::array<const char*, 3> libraries{
+	"libeay32",
+	"ssleay32",
+	"libcurl"
+};
 
 #define CREATE_MODELS  true
 #define CREATE_LIGHTS  true
@@ -233,7 +241,7 @@ void clearModelsSections() { traceLog
 			delete[] *it;
 		}
 
-		current_map.firing.~vector();
+		current_map.firing.clear();
 	}
 
 	if (!current_map.lighting.empty()) { traceLog
@@ -249,7 +257,7 @@ void clearModelsSections() { traceLog
 			delete[] *it;
 		}
 
-		current_map.lighting.~vector();
+		current_map.lighting.clear();
 	}
 
 	if (!current_map.LFD.empty()) { traceLog
@@ -265,7 +273,7 @@ void clearModelsSections() { traceLog
 			delete[] *it;
 	}
 
-		current_map.LFD.~vector();
+		current_map.LFD.clear();
 	}
 }
 
@@ -358,15 +366,15 @@ static PyObject* pos_light(float coords[3], uint8_t signType) {
 		colour[1] = 255.0;
 		colour[2] = 0.0;
 	}
-	else if (signType == 2) {	//green
+	else if (signType == 2) {	//blue
 		colour[0] = 0.0;
-		colour[1] = 255.0;
-		colour[2] = 0.0;
+		colour[1] = 126.0;
+		colour[2] = 232.0;
 	}
-	else {						//red
-		colour[0] = 255.0;
+	else {						//purple
+		colour[0] = 216.0;
 		colour[1] = 0.0;
-		colour[2] = 0.0;
+		colour[2] = 255.0;
 	}
 
 	colour[3] = 0.0;
@@ -485,19 +493,9 @@ uint8_t create_models() { traceLog
 		return 1;
 	}
 
-	bool createLighting = true, createFiring = true, createLFD = true;
-
-	if (PyDict_GetItemString(g_self->data, "createFiring") == Py_False) { traceLog
-		createFiring = false;
-	}
-
-	if (PyDict_GetItemString(g_self->data, "createLighting") == Py_False) { traceLog
-		createLighting = false;
-	}
-
-	if (PyDict_GetItemString(g_self->data, "createLFD") == Py_False) { traceLog
-		createLFD = false;
-	}
+	bool createLighting = PyDict_GetItemString(g_self->data, "createLighting") == Py_True;
+	bool createFiring   = PyDict_GetItemString(g_self->data, "createFiring")   == Py_True;
+	bool createLFD      = PyDict_GetItemString(g_self->data, "createLFD")      == Py_True;
 
 	debugLog("parsing...");
 
@@ -507,23 +505,23 @@ uint8_t create_models() { traceLog
 
 	debugLog("parsing OK!");
 
-	if (!current_map.sections_count || !current_map.minimap_count)
+	if (!current_map.sections_count)
 		return 2;
 
-	superExtendedDebugLog("sect count: %d\npos count: %d", (uint32_t)current_map.sections_count, (uint32_t)current_map.minimap_count);
+	superExtendedDebugLog("sect count: %d\npos count: %d", (uint32_t)current_map.sections_count, (uint32_t)current_map.getTotalCount());
 
 	debugLog("creating...");
 
 #if CREATE_MODELS
-	models.~vector();
-	models.resize(current_map.minimap_count);
+	models.clear();
+	models.resize(current_map.getTotalCount());
 #endif
 
 #if CREATE_LIGHTS
 	lights.clear();
 #endif
 
-	for (uint8_t i = NULL; i < current_map.minimap_count; i++) {
+	for (uint8_t i = NULL; i < current_map.getTotalCount(); i++) {
 #if CREATE_MODELS
 		if (models[i] != nullptr) {
 			Py_XDECREF(models[i]->model);
@@ -780,13 +778,14 @@ uint8_t init_models() { traceLog
 
 #endif
 
-	for (uint8_t i = NULL; i < current_map.minimap_count; i++) {
+	for (uint8_t i = NULL; i < current_map.getTotalCount(); i++) {
 		if (models[i] == nullptr) continue;
 
-		if (models[i]->model == Py_None || !models[i]->model || models[i]->processed) { traceLog
-			Py_XDECREF(models[i]->model);
+		if (models[i]->model == Py_None || !models[i]->model || models[i]->processed) {
+			traceLog
+				Py_XDECREF(models[i]->model);
 
-			models[i]->model  = nullptr;
+			models[i]->model = nullptr;
 			models[i]->coords = nullptr;
 			models[i]->processed = false;
 
@@ -810,84 +809,85 @@ uint8_t init_models() { traceLog
 			superExtendedDebugLog("True");
 		}
 		else superExtendedDebugLog("False");
-		
+
+		if (PyDict_GetItemString(g_self->data, "playAnimation")) {
 #if PATCH_9_22
-		/*
-		action = model.action('rotation')
-		if(action): action()
-		*/
+			/*
+			action = model.action('rotation')
+			if(action): action()
+			*/
 
-		if (PyObject_HasAttrString(models[i]->model, "action")) { //подстраховываемся
-			if (PyObject* action_func = PyObject_CallMethod(models[i]->model, "action", "s", "rotation")) {
-				if (PyObject* action = PyObject_CallObject(action_func, NULL))
-					Py_DECREF(action);
+			if (PyObject_HasAttrString(models[i]->model, "action")) { //подстраховываемся
+				if (PyObject* action_func = PyObject_CallMethod(models[i]->model, "action", "s", "rotation")) {
+					if (PyObject* action = PyObject_CallObject(action_func, NULL))
+						Py_DECREF(action);
 
-				Py_DECREF(action_func);
+						Py_DECREF(action_func);
 
-				superExtendedDebugLog("True");
+					superExtendedDebugLog("True");
+				}
+				else superExtendedDebugLog("False");
 			}
-			else superExtendedDebugLog("False");
-		}
-		else superExtendedDebugLog("animation OFF");
+			else superExtendedDebugLog("animation OFF");
 #else
-		/*
-				clipResource = model.deprecatedGetAnimationClipResource('rotation')
-				loader = AnimationSequence.Loader(clipResource, spaceID)
-				animator = loader.loadSync()
-				animator.bindTo(AnimationSequence.ModelWrapperContainer(model, spaceID))
-				animator.speed = animSpeed
-				animator.start()
+			/*
+					clipResource = model.deprecatedGetAnimationClipResource('rotation')
+					loader = AnimationSequence.Loader(clipResource, spaceID)
+					animator = loader.loadSync()
+					animator.bindTo(AnimationSequence.ModelWrapperContainer(model, spaceID))
+					animator.speed = animSpeed
+					animator.start()
 
-				self.animator = animator
-		*/
+					self.animator = animator
+			*/
 
-		
 
-		extendedDebugLog("creating animation...");
 
-		Py_INCREF(models[i]->model);
+			extendedDebugLog("creating animation...");
 
-		if (PyObject_HasAttrString(models[i]->model, "deprecatedGetAnimationClipResource")) { //подстраховываемся
-			if (PyObject* clipResource = PyObject_CallMethod(models[i]->model, "deprecatedGetAnimationClipResource", "s", "rotation")) {
-				if (PyObject* loader = PyObject_CallMethod(AnimationSequence, "Loader", "Ol", clipResource, spaceID)) {
-					if (PyObject* animator = PyObject_CallMethod(loader, "loadSync", NULL)) {
-						if (PyObject* binder = PyObject_CallMethod(AnimationSequence, "ModelWrapperContainer", "Ol", models[i]->model, spaceID)) {
-							PyObject* __bindTo = PyString_FromString("bindTo");
+			Py_INCREF(models[i]->model);
 
-							Py_INCREF(animator);
+			if (PyObject_HasAttrString(models[i]->model, "deprecatedGetAnimationClipResource")) { //подстраховываемся
+				if (PyObject* clipResource = PyObject_CallMethod(models[i]->model, "deprecatedGetAnimationClipResource", "s", "rotation")) {
+					if (PyObject* loader = PyObject_CallMethod(AnimationSequence, "Loader", "Ol", clipResource, spaceID)) {
+						if (PyObject* animator = PyObject_CallMethod(loader, "loadSync", NULL)) {
+							if (PyObject* binder = PyObject_CallMethod(AnimationSequence, "ModelWrapperContainer", "Ol", models[i]->model, spaceID)) {
+								PyObject* __bindTo = PyString_FromString("bindTo");
 
-							if (PyObject* res = PyObject_CallMethodObjArgs(animator, __bindTo, binder, NULL))
-								Py_DECREF(res);
+								Py_INCREF(animator);
 
-							Py_DECREF(animator);
+								if (PyObject* res = PyObject_CallMethodObjArgs(animator, __bindTo, binder, NULL))
+									Py_DECREF(res);
 
-							Py_DECREF(__bindTo);
+								Py_DECREF(animator);
 
-							Py_INCREF(animator);
+								Py_DECREF(__bindTo);
 
-							if (PyObject* res = PyObject_CallMethod(animator, "start", NULL))
-								Py_DECREF(res);
+								Py_INCREF(animator);
 
-							Py_DECREF(animator);
+								if (PyObject* res = PyObject_CallMethod(animator, "start", NULL))
+									Py_DECREF(res);
 
-							models[i]->animator = animator;
+								Py_DECREF(animator);
 
-							extendedDebugLog("creating animation OK!");
+								models[i]->animator = animator;
 
-							Py_DECREF(binder);
+								extendedDebugLog("creating animation OK!");
+
+								Py_DECREF(binder);
+							}
 						}
+
+						Py_DECREF(loader);
 					}
 
-					Py_DECREF(loader);
+					Py_DECREF(clipResource);
 				}
-
-				Py_DECREF(clipResource);
 			}
-		}
 
-		Py_DECREF(models[i]->model);
+			Py_DECREF(models[i]->model);
 #endif
-		
+	    }
 	}
 	
 	extendedDebugLog("models adding OK!");
@@ -1067,9 +1067,7 @@ void get(uint8_t map_ID) { traceLog
 
 	if (request) { traceLog
 		debugLog("Error code %d", request);
-#if trace_log
 		writeDebugDataToFile(GET, (char*)response_buffer, response_size);
-#endif
 		return;
 	}
 
@@ -1160,7 +1158,7 @@ end_cycle_del_models_1:
 		models.erase(it1);
 	}
 
-	models.~vector();
+	models.clear();
 	
 	extendedDebugLog("models deleting OK!");
 #endif
@@ -1172,7 +1170,17 @@ end_cycle_del_models_1:
 static PyObject* get_minimap(uint8_t markerID) { traceLog
 	extendedDebugLog("getting minimap...");
 
-	if (!isInited || first_check || request || !current_map.sections_count || !current_map.minimap_count || minimap == nullptr || !minimap[markerID] || markerID > 2) return PyTuple_New(NULL);
+	if (
+		!isInited                   ||
+		first_check                 ||
+		request                     ||
+		!current_map.sections_count ||
+		!current_map.minimap_count  ||
+		minimap == nullptr          ||
+		!minimap[markerID]          ||
+		markerID > 2
+	)
+		return NULL;
 
 	extendedDebugLog("getting minimap OK!");
 
@@ -1217,6 +1225,8 @@ void createMarkers() { traceLog
 
 					for (uint8_t i = NULL; i < 3; i++) {
 						PyObject* minimap_marks = get_minimap(i);
+						if (!minimap_marks)
+							continue;
 
 						res = PyObject_CallMethod(Minimap, "createMinimapPoints", "Os", minimap_marks, markerIDs[i]);
 
@@ -1227,6 +1237,8 @@ void createMarkers() { traceLog
 #else
 					for (uint8_t i = NULL; i < 3; i++) {
 						PyObject* minimap_marks = get_minimap(i);
+						if (!minimap_marks)
+							continue;
 
 						res = PyObject_CallMethod(Minimap, "createMinimapPoints", "Os", minimap_marks, "DeadPointEntry");
 
@@ -1271,7 +1283,7 @@ static PyObject* set_visible(bool isVisible) { traceLog
 
 	extendedDebugLog("Models visiblity changing...");
 
-	for (uint16_t i = NULL; i < current_map.minimap_count; i++) {
+	for (uint16_t i = NULL; i < current_map.getTotalCount(); i++) {
 		if (models[i] == nullptr) continue;
 
 		if (!models[i]->model || models[i]->model == Py_None || !models[i]->processed) { traceLog
@@ -1379,7 +1391,7 @@ uint8_t battle_greetings() { traceLog
 	if (!first_check && PyDict_GetItemString(g_self->data, "enabled") == Py_True) { traceLog
 		message_on = PyDict_GetItemString(g_self->i18n, "UI_message_on");
 
-		if (request != 9 && current_map.minimap_count) { traceLog
+		if (request != 9 && current_map.getTotalCount()) { traceLog
 			PyObject* message_count_raw_p = PyDict_GetItemString(g_self->i18n, "UI_trjcount_0");
 
 			if (message_count_raw_p) { traceLog
@@ -1393,7 +1405,7 @@ uint8_t battle_greetings() { traceLog
 
 				memcpy(message_count_raw, message_count_raw_src, size);
 
-				_itoa_s(current_map.minimap_count, counter, 5, 10);
+				_itoa_s(current_map.getTotalCount(), counter, 5, 10);
 				memcpy(&message_count_raw[size], counter, 5);
 				message_count_raw[size + 5] = NULL;
 
@@ -1587,8 +1599,6 @@ static PyObject* pos_fini(PyObject *self, PyObject *args) { traceLog
 		return PyInt_FromSize_t(2);
 	}
 
-	current_map.minimap_count = NULL;
-
 	if (current_map.sections_count && current_map.minimap_count) { traceLog
 #if CREATE_MARKERS
 		if (minimap != nullptr) { traceLog
@@ -1623,10 +1633,10 @@ static PyObject* pos_fini(PyObject *self, PyObject *args) { traceLog
 	//Py_END_ALLOW_THREADS
 	}
 
-	current_map.sections_count = NULL;
-	current_map.minimap_count = NULL;
-	mapID = NULL;
-	height_offset = 0.0;
+	current_map.sections_count = 0;
+	current_map.minimap_count  = 0;
+	mapID                      = 0;
+	height_offset              = 0.0;
 
 	extendedDebugLog("fini OK!");
 
@@ -1834,20 +1844,47 @@ static struct PyMethodDef pos_methods[] =
 
 PyMODINIT_FUNC initpos(void)
 {
-	HINSTANCE dllLoadRes1, dllLoadRes2, dllLoadRes3;
+	std::string native_path;
+	std::string minimap_module_path;
 
-	dllLoadRes1 = LoadLibraryA("./res_mods/mods/xfw_packages/" MOD_NAME "/native_32bit/libeay32.dll");
-	dllLoadRes2 = LoadLibraryA("./res_mods/mods/xfw_packages/" MOD_NAME "/native_32bit/ssleay32.dll");
-	dllLoadRes3 = LoadLibraryA("./res_mods/mods/xfw_packages/" MOD_NAME "/native_32bit/libcurl.dll");
-
-	if (!dllLoadRes1 || !dllLoadRes2 || !dllLoadRes3) {
-		debugLogEx(ERROR, "initevent - error while loading DLLs");
+	PyObject* platform = PyImport_ImportModule("platform");
+	if (!platform) {
+		debugLogEx(ERROR, "initpos - error while importing platform");
 
 		goto end_initpos_1;
 	}
 
+	PyObject* _architecture         = PyString_FromString("architecture");
+	PyObject* py_architecture_tuple = PyObject_CallMethodObjArgs(platform, _architecture, NULL);
+	Py_XDECREF(_architecture);
+	if (!py_architecture_tuple) {
+		debugLogEx(ERROR, "initpos - error while getting arch");
+
+		goto end_initpos_1;
+	}
+
+	PyObject* py_architecture = PyTuple_GetItem(py_architecture_tuple, 0);
+	if (!py_architecture) {
+		debugLogEx(ERROR, "initpos - error while getting arch item");
+		Py_DECREF(py_architecture_tuple);
+		goto end_initpos_2;
+	}
+
+	native_path         = "./res_mods/mods/xfw_packages/" MOD_NAME "/native_" + std::string(PyString_AsString(py_architecture)) + "/";
+	minimap_module_path = native_path + "Minimap.pyd";
+
+	Py_DECREF(py_architecture_tuple);
+
+	for (auto& lib_name : libraries) {
+		std::string path = native_path + lib_name + ".dll";
+		if (!LoadLibraryA(path.c_str())) {
+			debugLogEx(ERROR, "initpos - error while loading DLL: %s", path.c_str());
+			goto end_initpos_1;
+		}
+	}
+
 	if (auto err = curl_init()) { traceLog
-		debugLogEx(ERROR, "initevent - curl_init: error %d", err);
+		debugLogEx(ERROR, "initpos - curl_init: error %d", err);
 
 		goto end_initpos_1;
 	}
@@ -1939,7 +1976,7 @@ PyMODINIT_FUNC initpos(void)
 	if (!imp)
 		goto end_initpos_2;
 
-	PyObject* Minimap_module = PyObject_CallMethod(imp, "load_dynamic", "ss", "Minimap", "./res_mods/mods/xfw_packages/" MOD_NAME "/native_32bit/Minimap.pyd", NULL);
+	PyObject* Minimap_module = PyObject_CallMethod(imp, "load_dynamic", "ss", "Minimap", minimap_module_path.c_str(), NULL);
 	if (!Minimap_module)
 		goto end_initpos_2;
 

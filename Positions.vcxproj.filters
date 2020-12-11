@@ -60,9 +60,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="lib\Win32\python27.lib">
-      <Filter>lib\Win32</Filter>
-    </Library>
     <Library Include="lib\Win32\libcurl.lib">
       <Filter>lib\Win32</Filter>
     </Library>

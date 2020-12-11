@@ -20,9 +20,9 @@ typedef struct {
 ConfigObject* g_self = NULL;
 
 void init_config() {
-	Config::i18n.version = Config::version_id;
-	Config::data.version = Config::version_id;
-	Config::data.buttonShow = Config::buttons.buttonShow;
+	Config::i18n.version       = Config::version_id;
+	Config::data.version       = Config::version_id;
+	Config::data.buttonShow    = Config::buttons.buttonShow;
 	Config::data.buttonMinimap = Config::buttons.buttonMinimap;
 }
 
@@ -165,69 +165,69 @@ PyObject* init_i18n() {
 		goto end_init_i18n;
 	}
 
-	PyObject* UI_description = PyString_FromString("Free Positions Mod");
-	PyObject* empty_tooltip = PyString_FromStringAndSize("", NULL);
-	PyObject* UI_setting_buttonShow_text = PyString_FromString("Button: Show positions");
-	PyObject* UI_setting_buttonMinimap_text = PyString_FromString("Button: Show minimap markers");
-	PyObject* UI_setting_showOnStartBattle_text = PyString_FromString("Show on Start Battle");
+	PyObject* UI_description                      = PyString_FromString("Free Positions Mod");
+	PyObject* empty_tooltip                       = PyString_FromStringAndSize("", NULL);
+	PyObject* UI_setting_buttonShow_text          = PyString_FromString("Button: Show positions");
+	PyObject* UI_setting_buttonMinimap_text       = PyString_FromString("Button: Show minimap markers");
+	PyObject* UI_setting_showOnStartBattle_text   = PyString_FromString("Show on Start Battle");
 	PyObject* UI_setting_hideMarkersInBattle_text = PyString_FromString("Hide markers on start battle");
 	PyObject* UI_setting_showBattleGreetings_text = PyString_FromString("Show message on start battle");
-	PyObject* UI_setting_createMarkers_text = PyString_FromString("Create markers on minimap");
-	PyObject* UI_setting_createLighting_text = PyString_FromString("Create lighting positions");
-	PyObject* UI_setting_createFiring_text = PyString_FromString("Create firing positions");
-	PyObject* UI_setting_createLFD_text = PyString_FromString("Create LFD positions");
-	PyObject* UI_setting_playAnimation_text = PyString_FromString("Play animation");
-	PyObject* UI_setting_newModels_text = PyString_FromString("New models");
-	PyObject* UI_message_thx = PyString_FromString("Positions Mod: Loaded 832 positions.");
-	PyObject* UI_message_thx_2 = PyString_FromString("Official site of Positions mod");
-	PyObject* UI_message_channel = PyString_FromString("Official channel RAINN VOD of Positions mod");
-	PyObject* UI_message_trj_ad = PyString_FromString("Like Positions Mod? ");
-	PyObject* UI_message_trj_ad_2 = PyString_FromString("Try out the free Trajectory Mod");
-	PyObject* UI_message_on = PyString_FromString("Mod Positions Free ON");
-	PyObject* UI_message_off = PyString_FromString("Mod Positions Free OFF");
-	PyObject* UI_poscount_0 = PyString_FromString("Positions count: %d");
-	PyObject* UI_poscount_1 = PyString_FromString("There aren't any positions!");
-	PyObject* UI_err_2 = PyString_FromString("Error. Redownload mod ");
-	PyObject* UI_err_3 = PyString_FromString("Error. Maybe network don't works?");
-	PyObject* UI_err_6 = PyString_FromString("Error. Redownload mod ");
-	PyObject* UI_link = PyString_FromString("from official site");
+	PyObject* UI_setting_createMarkers_text       = PyString_FromString("Create markers on minimap");
+	PyObject* UI_setting_createLighting_text      = PyString_FromString("Create lighting positions");
+	PyObject* UI_setting_createFiring_text        = PyString_FromString("Create firing positions");
+	PyObject* UI_setting_createLFD_text           = PyString_FromString("Create armoring positions");
+	PyObject* UI_setting_playAnimation_text       = PyString_FromString("Play animation");
+	PyObject* UI_setting_newModels_text           = PyString_FromString("New models");
+	PyObject* UI_message_thx                      = PyString_FromString("Positions Mod: Loaded 1515 positions!");
+	PyObject* UI_message_thx_2                    = PyString_FromString("Official site of Positions mod");
+	PyObject* UI_message_channel                  = PyString_FromString("Official channel RAINN VOD of Positions mod");
+	PyObject* UI_message_trj_ad                   = PyString_FromString("Like Positions Mod? ");
+	PyObject* UI_message_trj_ad_2                 = PyString_FromString("Join the beta testing of the mod Autoupdater!");
+	PyObject* UI_message_on                       = PyString_FromString("Mod Positions Free ON");
+	PyObject* UI_message_off                      = PyString_FromString("Mod Positions Free OFF");
+	PyObject* UI_poscount_0                       = PyString_FromString("Positions count: %d");
+	PyObject* UI_poscount_1                       = PyString_FromString("There aren't any positions!");
+	PyObject* UI_err_2                            = PyString_FromString("Error. Redownload mod ");
+	PyObject* UI_err_3                            = PyString_FromString("Error. Maybe network don't works?");
+	PyObject* UI_err_6                            = PyString_FromString("Error. Redownload mod ");
+	PyObject* UI_link                             = PyString_FromString("from official site");
 
-	if (PyDict_SetItemString(i18n, "UI_description", UI_description) ||
-		PyDict_SetItemString(i18n, "UI_setting_buttonShow_text", UI_setting_buttonShow_text) ||
-		PyDict_SetItemString(i18n, "UI_setting_buttonShow_tooltip", empty_tooltip) ||
-		PyDict_SetItemString(i18n, "UI_setting_buttonMinimap_text", UI_setting_buttonMinimap_text) ||
-		PyDict_SetItemString(i18n, "UI_setting_buttonMinimap_tooltip", empty_tooltip) ||
-		PyDict_SetItemString(i18n, "UI_setting_showOnStartBattle_text", UI_setting_showOnStartBattle_text) ||
-		PyDict_SetItemString(i18n, "UI_setting_showOnStartBattle_tooltip", empty_tooltip) ||
-		PyDict_SetItemString(i18n, "UI_setting_hideMarkersInBattle_text", UI_setting_hideMarkersInBattle_text) ||
-		PyDict_SetItemString(i18n, "UI_setting_hideMarkersInBattle_tooltip", empty_tooltip) ||
-		PyDict_SetItemString(i18n, "UI_setting_showBattleGreetings_text", UI_setting_showBattleGreetings_text) ||
-		PyDict_SetItemString(i18n, "UI_setting_showBattleGreetings_tooltip", empty_tooltip) ||
-		PyDict_SetItemString(i18n, "UI_setting_createMarkers_text", UI_setting_createMarkers_text) ||
-		PyDict_SetItemString(i18n, "UI_setting_createMarkers_tooltip", empty_tooltip) ||
-		PyDict_SetItemString(i18n, "UI_setting_createLighting_text", UI_setting_createLighting_text) ||
-		PyDict_SetItemString(i18n, "UI_setting_createLighting_tooltip", empty_tooltip) ||
-		PyDict_SetItemString(i18n, "UI_setting_createFiring_text", UI_setting_createFiring_text) ||
-		PyDict_SetItemString(i18n, "UI_setting_createFiring_tooltip", empty_tooltip) ||
-		PyDict_SetItemString(i18n, "UI_setting_createLFD_text", UI_setting_createLFD_text) ||
-		PyDict_SetItemString(i18n, "UI_setting_createLFD_tooltip", empty_tooltip) ||
-		PyDict_SetItemString(i18n, "UI_setting_playAnimation_text", UI_setting_playAnimation_text) ||
-		PyDict_SetItemString(i18n, "UI_setting_playAnimation_tooltip", empty_tooltip) ||
-		PyDict_SetItemString(i18n, "UI_setting_newModels_text", UI_setting_newModels_text) ||
-		PyDict_SetItemString(i18n, "UI_setting_newModels_tooltip", empty_tooltip) ||
-		PyDict_SetItemString(i18n, "UI_message_thx", UI_message_thx) ||
-		PyDict_SetItemString(i18n, "UI_message_thx_2", UI_message_thx_2) ||
-		PyDict_SetItemString(i18n, "UI_message_channel", UI_message_channel) ||
-		PyDict_SetItemString(i18n, "UI_message_off", UI_message_off) ||
-		PyDict_SetItemString(i18n, "UI_message_on", UI_message_on) ||
-		PyDict_SetItemString(i18n, "UI_message_trj_ad", UI_message_trj_ad) ||
-		PyDict_SetItemString(i18n, "UI_message_trj_ad_2", UI_message_trj_ad_2) ||
-		PyDict_SetItemString(i18n, "UI_poscount_0", UI_poscount_0) ||
-		PyDict_SetItemString(i18n, "UI_poscount_1", UI_poscount_1) ||
-		PyDict_SetItemString(i18n, "UI_err_2", UI_err_2) ||
-		PyDict_SetItemString(i18n, "UI_err_3", UI_err_3) ||
-		PyDict_SetItemString(i18n, "UI_err_6", UI_err_6) ||
-		PyDict_SetItemString(i18n, "UI_link", UI_link)
+	if (PyDict_SetItemString(i18n, "UI_description",                         UI_description)                      ||
+		PyDict_SetItemString(i18n, "UI_setting_buttonShow_text",             UI_setting_buttonShow_text)          ||
+		PyDict_SetItemString(i18n, "UI_setting_buttonShow_tooltip",          empty_tooltip)                       ||
+		PyDict_SetItemString(i18n, "UI_setting_buttonMinimap_text",          UI_setting_buttonMinimap_text)       ||
+		PyDict_SetItemString(i18n, "UI_setting_buttonMinimap_tooltip",       empty_tooltip)                       ||
+		PyDict_SetItemString(i18n, "UI_setting_showOnStartBattle_text",      UI_setting_showOnStartBattle_text)   ||
+		PyDict_SetItemString(i18n, "UI_setting_showOnStartBattle_tooltip",   empty_tooltip)                       ||
+		PyDict_SetItemString(i18n, "UI_setting_hideMarkersInBattle_text",    UI_setting_hideMarkersInBattle_text) ||
+		PyDict_SetItemString(i18n, "UI_setting_hideMarkersInBattle_tooltip", empty_tooltip)                       ||
+		PyDict_SetItemString(i18n, "UI_setting_showBattleGreetings_text",    UI_setting_showBattleGreetings_text) ||
+		PyDict_SetItemString(i18n, "UI_setting_showBattleGreetings_tooltip", empty_tooltip)                       ||
+		PyDict_SetItemString(i18n, "UI_setting_createMarkers_text",          UI_setting_createMarkers_text)       ||
+		PyDict_SetItemString(i18n, "UI_setting_createMarkers_tooltip",       empty_tooltip)                       ||
+		PyDict_SetItemString(i18n, "UI_setting_createLighting_text",         UI_setting_createLighting_text)      ||
+		PyDict_SetItemString(i18n, "UI_setting_createLighting_tooltip",      empty_tooltip)                       ||
+		PyDict_SetItemString(i18n, "UI_setting_createFiring_text",           UI_setting_createFiring_text)        ||
+		PyDict_SetItemString(i18n, "UI_setting_createFiring_tooltip",        empty_tooltip)                       ||
+		PyDict_SetItemString(i18n, "UI_setting_createLFD_text",              UI_setting_createLFD_text)           ||
+		PyDict_SetItemString(i18n, "UI_setting_createLFD_tooltip",           empty_tooltip)                       ||
+		PyDict_SetItemString(i18n, "UI_setting_playAnimation_text",          UI_setting_playAnimation_text)       ||
+		PyDict_SetItemString(i18n, "UI_setting_playAnimation_tooltip",       empty_tooltip)                       ||
+		PyDict_SetItemString(i18n, "UI_setting_newModels_text",              UI_setting_newModels_text)           ||
+		PyDict_SetItemString(i18n, "UI_setting_newModels_tooltip",           empty_tooltip)                       ||
+		PyDict_SetItemString(i18n, "UI_message_thx",                         UI_message_thx)                      ||
+		PyDict_SetItemString(i18n, "UI_message_thx_2",                       UI_message_thx_2)                    ||
+		PyDict_SetItemString(i18n, "UI_message_channel",                     UI_message_channel)                  ||
+		PyDict_SetItemString(i18n, "UI_message_off",                         UI_message_off)                      ||
+		PyDict_SetItemString(i18n, "UI_message_on",                          UI_message_on)                       ||
+		PyDict_SetItemString(i18n, "UI_message_trj_ad",                      UI_message_trj_ad)                   ||
+		PyDict_SetItemString(i18n, "UI_message_trj_ad_2",                    UI_message_trj_ad_2)                 ||
+		PyDict_SetItemString(i18n, "UI_poscount_0",                          UI_poscount_0)                       ||
+		PyDict_SetItemString(i18n, "UI_poscount_1",                          UI_poscount_1)                       ||
+		PyDict_SetItemString(i18n, "UI_err_2",                               UI_err_2)                            ||
+		PyDict_SetItemString(i18n, "UI_err_3",                               UI_err_3)                            ||
+		PyDict_SetItemString(i18n, "UI_err_6",                               UI_err_6)                            ||
+		PyDict_SetItemString(i18n, "UI_link",                                UI_link)
 		) {
 end_init_i18n:
 		Py_DECREF(i18n);

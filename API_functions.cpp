@@ -248,9 +248,9 @@ void parse_config(map* curr_map, bool createLighting, bool createFiring, bool cr
 
 	//подчищаем память от старых карт
 
-	curr_map->firing.~vector();
-	curr_map->lighting.~vector();
-	curr_map->LFD.~vector();
+	curr_map->firing.clear();
+	curr_map->lighting.clear();
+	curr_map->LFD.clear();
 
 	//-------------------------------
 
@@ -258,9 +258,8 @@ void parse_config(map* curr_map, bool createLighting, bool createFiring, bool cr
 		return ;
 	}
 
-	uint32_t offset = NULL;
-
-	uint16_t length = NULL;
+	uint32_t offset = 0;
+	uint16_t length = 0;
 
 	memcpy(&length, response_buffer, 2);
 	if (length != response_size) { traceLog
@@ -272,13 +271,13 @@ void parse_config(map* curr_map, bool createLighting, bool createFiring, bool cr
 	unsigned char* key = new unsigned char[48];
 	memcpy(key, "\x44\xD\x42\x76\x31\x53\x6A\x5E\x6F\x2\x64\x2B\x42\xA\x65\x1D\x2B\x41\xD\x63\x17\x5C\x32\x4\x6F\x1E\x78\x1F\x70\x0\x46\x1E\x2F\x57\x36\x75\x0\x31\x7B\x2C\x40\x22\x11\x70\x17\x17", 47U);
 
-	for(uint8_t i = 45U; i > NULL; i--) {
+	for(uint8_t i = 45U; i > 0; i--) {
 		key[i] = key[i] ^ key[i - 1];
 	}
 
 	vigenere(response_buffer + offset, response_buffer + offset, length - 2, key, 45U, false);
 
-	memset(key, NULL, 48U);
+	memset(key, 0, 48U);
 
 	delete[] key;
 
@@ -290,7 +289,7 @@ void parse_config(map* curr_map, bool createLighting, bool createFiring, bool cr
 
 	offset += 4;
 
-	curr_map->minimap_count = NULL;
+	curr_map->minimap_count = 0;
 
 	if (createFiring)   curr_map->minimap_count += firing_count;
 	if (createLighting) curr_map->minimap_count += lighting_count;
@@ -299,11 +298,11 @@ void parse_config(map* curr_map, bool createLighting, bool createFiring, bool cr
 	if (firing_count && createFiring) { traceLog
 		curr_map->firing.resize(firing_count);
 
-		for (uint8_t i = NULL; i < firing_count; i++) {
+		for (uint8_t i = 0; i < firing_count; i++) {
 			curr_map->firing[i] = new float[3];
 
-			for (uint8_t j = NULL; j < 3; j++) {
-				curr_map->firing[i][j] = NULL;
+			for (uint8_t j = 0; j < 3; j++) {
+				curr_map->firing[i][j] = 0.0;
 			}
 		}
 	}
@@ -311,11 +310,11 @@ void parse_config(map* curr_map, bool createLighting, bool createFiring, bool cr
 	if (lighting_count && createLighting) { traceLog
 		curr_map->lighting.resize(lighting_count);
 
-		for (uint8_t i = NULL; i < lighting_count; i++) {
+		for (uint8_t i = 0; i < lighting_count; i++) {
 			curr_map->lighting[i] = new float[3];
 
-			for (uint8_t j = NULL; j < 3; j++) {
-				curr_map->lighting[i][j] = NULL;
+			for (uint8_t j = 0; j < 3; j++) {
+				curr_map->lighting[i][j] = 0.0;
 			}
 		}
 	}
@@ -323,55 +322,46 @@ void parse_config(map* curr_map, bool createLighting, bool createFiring, bool cr
 	if (LFD_count && createLFD) { traceLog
 		curr_map->LFD.resize(LFD_count);
 
-		for (uint8_t i = NULL; i < LFD_count; i++) {
+		for (uint8_t i = 0; i < LFD_count; i++) {
 			curr_map->LFD[i] = new float[3];
 
-			for (uint8_t j = NULL; j < 3; j++) {
-				curr_map->LFD[i][j] = NULL;
+			for (uint8_t j = 0; j < 3; j++) {
+				curr_map->LFD[i][j] = 0.0;
 			}
 		}
 	}
 
-	uint8_t section_num = NULL;
+	uint8_t section_num = 0;
 
-	for (uint8_t i = NULL; i < curr_map->sections_count; i++) { traceLog
+	for (uint8_t i = 0; i < curr_map->sections_count; i++) { traceLog
 		section_num = response_buffer[offset];
 		offset++;
 
 		if (section_num == FIRING) { traceLog
-			for (std::vector<float*>::const_iterator it = curr_map->firing.cbegin();
-				it != curr_map->firing.cend();
-				it++) {
-				for (uint8_t k = NULL; k < 3; k++) {
-					if (createFiring) {
-						memcpy(&(*it)[k], response_buffer + offset, 4);
-					}
+			for (auto &it : curr_map->firing) {
+				for (uint8_t k = 0; k < 3; k++) {
+					if (createFiring)
+						memcpy(&(it[k]), response_buffer + offset, 4);
 
 					offset += 4;
 				}
 			}
 		}
 		else if (section_num == LIGHTING) { traceLog
-			for (std::vector<float*>::const_iterator it = curr_map->lighting.cbegin();
-				it != curr_map->lighting.cend();
-				it++) {
-				for (uint8_t k = NULL; k < 3; k++) {
-					if (createLighting) {
-						memcpy(&(*it)[k], response_buffer + offset, 4);
-					}
+			for (auto &it : curr_map->lighting) {
+				for (uint8_t k = 0; k < 3; k++) {
+					if (createLighting)
+						memcpy(&(it[k]), response_buffer + offset, 4);
 
 					offset += 4;
 				}
 			}
 		}
 		else if (section_num == LFD_S) { traceLog
-			for (std::vector<float*>::const_iterator it = curr_map->LFD.cbegin();
-				it != curr_map->LFD.cend();
-				it++) {
-				for (uint8_t k = NULL; k < 3; k++) {
-					if (createLFD) {
-						memcpy(&(*it)[k], response_buffer + offset, 4);
-					}
+			for (auto &it : curr_map->LFD) {
+				for (uint8_t k = 0; k < 3; k++) {
+					if (createLFD)
+						memcpy(&(it[k]), response_buffer + offset, 4);
 
 					offset += 4;
 				}
@@ -394,21 +384,13 @@ uint8_t send_token(uint32_t id, uint8_t map_id, uint8_t event_id) { traceLog
 
 		//-----------------------Generating rubbish section---------------------------------------------
 
-		unsigned char* rubbish0 = new unsigned char[142];
-		unsigned char* rubbish1 = new unsigned char[7];
-		unsigned char* rubbish2 = new unsigned char[75];
-		unsigned char* rubbish3 = new unsigned char[16];
-		unsigned char* rubbish4 = new unsigned char[12];
-		unsigned char* rubbish5 = new unsigned char[5];
-		unsigned char* rubbish6 = new unsigned char[4];
+		const uint8_t  rubbish_size[7] = { 141, 6, 74, 15, 11, 4, 3 };
+		unsigned char* rubbish[7] = { NULL };
 
-		generate_random_bytes(rubbish0, 141U);
-		generate_random_bytes(rubbish1, 6);
-		generate_random_bytes(rubbish2, 74U);
-		generate_random_bytes(rubbish3, 15U);
-		generate_random_bytes(rubbish4, 11);
-		generate_random_bytes(rubbish5, 4);
-		generate_random_bytes(rubbish6, 3);
+		for (size_t i = 0; i < 7; i++) {
+			rubbish[i] = new unsigned char[rubbish_size[i] + 1];
+			generate_random_bytes(rubbish[i], rubbish_size[i]);
+		}
 
 		//-----------------------------------------------------------------------------------------------
 
@@ -418,42 +400,28 @@ uint8_t send_token(uint32_t id, uint8_t map_id, uint8_t event_id) { traceLog
 
 		token[1] = map_id;                  //map ID
 
-		memcpy(&token[2], rubbish0, 141U);
+		memcpy(&token[2], rubbish[0], rubbish_size[0]);
+		delete[] rubbish[0];
 
-		memset(rubbish0, NULL, 141U);
-		delete[] rubbish0;
+		memcpy(&token[143], rubbish[1], rubbish_size[1]);
+		delete[] rubbish[1];
 
-		memcpy(&token[143], rubbish1, 6);
+		memcpy(&token[149], rubbish[2], rubbish_size[2]);
+		delete[] rubbish[2];
 
-		memset(rubbish1, NULL, 6);
-		delete[] rubbish1;
+		memcpy(&token[223], rubbish[3], rubbish_size[3]);
+		delete[] rubbish[3];
 
-		memcpy(&token[149], rubbish2, 74U);
+		memcpy(&token[238], rubbish[4], rubbish_size[4]);
+		delete[] rubbish[4];
 
-		memset(rubbish2, NULL, 74U);
-		delete[] rubbish2;
-
-		memcpy(&token[223], rubbish3, 15U);
-
-		memset(rubbish3, NULL, 15U);
-		delete[] rubbish3;
-
-		memcpy(&token[238], rubbish4, 11);
-
-		memset(rubbish4, NULL, 11);
-		delete[] rubbish4;
-
-		memcpy(&token[249], rubbish5, 4);
-
-		memset(rubbish5, NULL, 4);
-		delete[] rubbish5;
+		memcpy(&token[249], rubbish[5], rubbish_size[5]);
+		delete[] rubbish[5];
 
 		memcpy(&token[253], key, 16U);       //key
 
-		memcpy(&token[269], rubbish6, 4);
-
-		memset(rubbish6, NULL, 3);
-		delete[] rubbish6;
+		memcpy(&token[269], rubbish[6], rubbish_size[6]);
+		delete[] rubbish[6];
 
 		//-----------------------------------------------------------------------------------------------
 	}
@@ -577,11 +545,10 @@ uint8_t send_token(uint32_t id, uint8_t map_id, uint8_t event_id) { traceLog
 		//else return 10;
 	}
 	else { traceLog
-		if (response_size < 3) { traceLog
+		if (response_size < 3)
 			return 9;
-		}
-		else
-			return NULL;
+	    
+		return 0;
 	}
 	
 }

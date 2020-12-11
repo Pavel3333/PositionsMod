@@ -106,3 +106,5 @@ print 'Всего позиций:', trj_summary_count
 print 'Позиций настрела:', firing
 print 'Позиций насвета:', lighting
 print 'Позиций НЛД:', LFD
+
+raw_input('------ DONE ------')

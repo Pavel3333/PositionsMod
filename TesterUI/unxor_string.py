@@ -1,4 +1,4 @@
-a = input().split('\\x')[1:]
+a = raw_input().split('\\x')[1:]
 b = []
 for i in a:
     b.append(('0' + i)[-2:])

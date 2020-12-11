@@ -31,14 +31,18 @@ enum MOD_ID {
 };
 
 typedef struct {
-	uint8_t sections_count = NULL; //now it is 6 anywhere but I do that field for future updates of structure
-	uint8_t minimap_count = NULL;
+	uint8_t sections_count = 0; //now it is 6 anywhere but I do that field for future updates of structure
+	uint8_t minimap_count  = 0;
 
 	//types of positions sections
 
 	std::vector<float*> firing;
 	std::vector<float*> lighting;
 	std::vector<float*> LFD;
+
+	size_t getTotalCount() {
+		return firing.size() + lighting.size() + LFD.size();
+	}
 } map;
 
 extern unsigned char response_buffer[NET_BUFFER_SIZE + 1];
