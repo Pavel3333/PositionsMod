@@ -35,9 +35,8 @@ typedef struct _mod_model {
 	bool processed = false;
 
 	PyObject* model    = nullptr;
-#if !PATCH_9_22
 	PyObject* animator = nullptr;
-#endif
+
 	float* coords      = nullptr;
 } ModModel;
 
@@ -61,11 +60,9 @@ ModLight::ModLight(float coords[3], uint8_t signType)
 
 ModLight::~ModLight()
 {
-#if !PATCH_9_22
 	if (light && light != Py_None) {
 		if (PyObject* result_light = PyObject_CallMethod(light, "destroyLight", NULL)) Py_DECREF(result_light);
 	}
-#endif
 
 	Py_XDECREF(light);
 
@@ -76,9 +73,7 @@ ModLight::~ModLight()
 std::vector<std::shared_ptr<ModLight>> lights;
 #endif
 
-#if !PATCH_9_22
 PyObject* AnimationSequence = nullptr;
-#endif
 
 PyObject* BigWorld = nullptr;
 
@@ -383,19 +378,6 @@ static PyObject* pos_light(float coords[3], uint8_t signType) {
 		PyTuple_SET_ITEM(colour_p, i, PyFloat_FromDouble(colour[i]));
 
 	delete[] colour;
-
-#if PATCH_9_22
-	//-----------visible------------
-
-	PyObject* visible = PyBool_FromLong(1);
-
-	if (auto res = PyObject_SetAttrString(Light, "visible", visible)) { traceLog
-		extendedDebugLog("PyOmniLight visible setting FAILED");
-
-		Py_DECREF(visible);
-		goto end_pos_light_2;
-	}
-#endif
 
 	//------------------------------
 
@@ -754,8 +736,7 @@ uint8_t init_models() { traceLog
 #if CREATE_MODELS
 	debugLog("models adding...");
 
-#if !PATCH_9_22
-	//получение BigWorld.player().spaceID
+	//get BigWorld.player().spaceID
 
 	PyObject* player = PyObject_CallMethod(BigWorld, "player", NULL);
 
@@ -775,8 +756,6 @@ uint8_t init_models() { traceLog
 		return 3;
 	
 	Py_DECREF(spaceID_py);
-
-#endif
 
 	for (uint8_t i = NULL; i < current_map.getTotalCount(); i++) {
 		if (models[i] == nullptr) continue;
@@ -811,25 +790,6 @@ uint8_t init_models() { traceLog
 		else superExtendedDebugLog("False");
 
 		if (PyDict_GetItemString(g_self->data, "playAnimation")) {
-#if PATCH_9_22
-			/*
-			action = model.action('rotation')
-			if(action): action()
-			*/
-
-			if (PyObject_HasAttrString(models[i]->model, "action")) { //подстраховываемся
-				if (PyObject* action_func = PyObject_CallMethod(models[i]->model, "action", "s", "rotation")) {
-					if (PyObject* action = PyObject_CallObject(action_func, NULL))
-						Py_DECREF(action);
-
-						Py_DECREF(action_func);
-
-					superExtendedDebugLog("True");
-				}
-				else superExtendedDebugLog("False");
-			}
-			else superExtendedDebugLog("animation OFF");
-#else
 			/*
 					clipResource = model.deprecatedGetAnimationClipResource('rotation')
 					loader = AnimationSequence.Loader(clipResource, spaceID)
@@ -840,8 +800,6 @@ uint8_t init_models() { traceLog
 
 					self.animator = animator
 			*/
-
-
 
 			extendedDebugLog("creating animation...");
 
@@ -886,7 +844,6 @@ uint8_t init_models() { traceLog
 			}
 
 			Py_DECREF(models[i]->model);
-#endif
 	    }
 	}
 	
@@ -1143,10 +1100,8 @@ uint8_t del_models() { traceLog
 		Py_XDECREF(model->model);
 		model->model = nullptr;
 
-#if !PATCH_9_22
 		Py_XDECREF(model->animator);
 		model->animator = nullptr;
-#endif
 
 		model->coords   = nullptr;
 
@@ -1896,19 +1851,6 @@ PyMODINIT_FUNC initpos(void)
 
 	debugLog("appLoader init...");
 
-#if PATCH_9_22
-	PyObject* appLoader = PyImport_ImportModule("gui.app_loader");
-
-	if (!appLoader) 
-		goto end_initpos_1;
-
-	g_appLoader = PyObject_GetAttrString(appLoader, "g_appLoader");
-
-	Py_DECREF(appLoader);
-
-	if (!g_appLoader) 
-		goto end_initpos_1;
-#else
 	PyObject* appLoader = PyImport_ImportModule("skeletons.gui.app_loader");
 
 	if (!appLoader)
@@ -1938,7 +1880,6 @@ PyMODINIT_FUNC initpos(void)
 
 	if (!g_appLoader)
 		goto end_initpos_1;
-#endif
 
 	debugLog("appLoader init OK");
 
@@ -1997,12 +1938,11 @@ PyMODINIT_FUNC initpos(void)
 
 #endif
 
-#if !PATCH_9_22
 	AnimationSequence = PyImport_ImportModule("AnimationSequence");
 
 	if(!AnimationSequence)
 		goto end_initpos_3;
-#endif
+
 	debugLog("g_gui module loading...");
 
 	PyObject* mod_mods_gui = PyImport_ImportModule("gui.mods.mod_mods_gui");
@@ -2036,11 +1976,7 @@ PyMODINIT_FUNC initpos(void)
 			goto end_initpos_3;
 	}
 	else { traceLog
-#if PATCH_9_22
-		PyObject* data_i18n = PyObject_CallMethod(g_gui, "register_data", "sOO",  Config::ids, g_self->data, g_self->i18n);
-#else
 		PyObject* data_i18n = PyObject_CallMethod(g_gui, "register_data", "sOOs", Config::ids, g_self->data, g_self->i18n, "pavel3333");
-#endif
 
 		if (!data_i18n) { traceLog
 			Py_DECREF(g_gui);
