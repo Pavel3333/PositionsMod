@@ -1,4 +1,5 @@
-a = raw_input().split('\\x')[1:]
+a = raw_input().split('\\x')
+a = filter(bool, a)
 b = []
 for i in a:
     b.append(('0' + i)[-2:])
@@ -10,8 +11,10 @@ c_hex = ''
 c_whex = ''
 
 for i in b[:-1]:
-    c_hex += '\\x'[-2:] + i[-2:]
-    c_whex += chr(int(i[-2:], 16))
+    i_whex = i.split('0x')[-1]
+    
+    c_hex += '\\x'[-2:] + i_whex
+    c_whex += chr(int(i_whex, 16))
 
 print 'hex        : "' + c_hex + '"'
 print 'without hex: "' + c_whex + '"'

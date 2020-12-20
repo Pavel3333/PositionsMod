@@ -31,14 +31,26 @@ std::array<const char*, 3> libraries{
 static PyObject* pos_light(float coords[3], uint8_t signType);
 
 #if CREATE_MODELS
-typedef struct _mod_model {
-	bool processed = false;
+static PyObject* pos_model(char* path, float coords[3]);
 
-	PyObject* model    = nullptr;
-	PyObject* animator = nullptr;
+struct ModModel {
+	ModModel(char* modelPath = nullptr, float* coords = nullptr, PyObject* animator = nullptr, bool processed = false)
+		: processed(processed)
+		, animator(animator)
+		, coords(coords)
+	{
+		model = (modelPath && coords)
+			? pos_model(modelPath, coords)
+			: nullptr;
+	}
 
-	float* coords      = nullptr;
-} ModModel;
+	bool processed;
+
+	PyObject* model;
+	PyObject* animator;
+
+	float* coords;
+} ;
 
 std::vector<ModModel*> models;
 #endif
@@ -556,17 +568,9 @@ uint8_t create_models() { traceLog
 
 	//firing section
 
-	uint8_t size = 54;
-
-	if (isNewModels) size = 53;
-
-	char* firing_path = new char[size];
-	if (isNewModels) memcpy(firing_path, "\x6f\xd\x67\x2\x61\x15\x66\x49\x39\x58\x2e\x4b\x27\x14\x27\x14\x27\x78\x8\x67\x14\x7d\x9\x60\xf\x61\x12\x3d\x53\x36\x41\x1e\x73\x1c\x78\x1d\x71\x2\x2d\x5e\x37\x50\x3e\xf\x21\x4c\x23\x47\x22\x4e\x4e", size - 1);
-	else             memcpy(firing_path, "\x6F\xD\x67\x2\x61\x15\x66\x49\x39\x58\x2E\x4B\x27\x14\x27\x14\x27\x78\x8\x67\x14\x7D\x9\x60\xF\x61\x12\x3D\x50\x3F\x5B\x3E\x52\x21\xE\x62\xD\x69\x59\x76\x5\x6C\xB\x65\x54\x7A\x17\x78\x1C\x79\x15\x15", size - 1);
-
-	for (uint8_t i = size - 2; i > NULL; i--) {
-		firing_path[i] = firing_path[i] ^ firing_path[i - 1];
-	}
+	char* firing_path = isNewModels
+		? "objects/pavel3333_positions/new_models/sign1.model"
+		: "objects/pavel3333_positions/models/lod0/sign1.model";
 
 	superExtendedDebugLog("firing: [");
 
@@ -584,11 +588,10 @@ uint8_t create_models() { traceLog
 
 				superExtendedDebugLog("[");
 #if CREATE_MODELS
-				models[counter_model] = new ModModel;
-
-				models[counter_model]->coords    = *it;
-				models[counter_model]->model     = pos_model(firing_path, *it);
-				models[counter_model]->processed = false;
+				models[counter_model] = new ModModel {
+					firing_path,
+					*it
+				};
 #endif
 
 #if CREATE_LIGHTS
@@ -605,21 +608,11 @@ uint8_t create_models() { traceLog
 
 	superExtendedDebugLog("], ");
 
-	delete[] firing_path;
-
 	//lighting section
 
-	size = 54;
-
-	if (isNewModels) size = 53;
-
-	char* lighting_path = new char[size];
-	if (isNewModels) memcpy(lighting_path, "\x6f\xd\x67\x2\x61\x15\x66\x49\x39\x58\x2e\x4b\x27\x14\x27\x14\x27\x78\x8\x67\x14\x7d\x9\x60\xf\x61\x12\x3d\x53\x36\x41\x1e\x73\x1c\x78\x1d\x71\x2\x2d\x5e\x37\x50\x3e\xc\x22\x4f\x20\x44\x21\x4d\x4d", size - 1);
-	else             memcpy(lighting_path, "\x6F\xD\x67\x2\x61\x15\x66\x49\x39\x58\x2E\x4B\x27\x14\x27\x14\x27\x78\x8\x67\x14\x7D\x9\x60\xF\x61\x12\x3D\x50\x3F\x5B\x3E\x52\x21\xE\x62\xD\x69\x59\x76\x5\x6C\xB\x65\x57\x79\x14\x7B\x1F\x7A\x16\x16", size - 1);
-
-	for (uint8_t i = size - 2; i > NULL; i--) {
-		lighting_path[i] = lighting_path[i] ^ lighting_path[i - 1];
-	}
+	char* lighting_path = isNewModels
+		?"objects/pavel3333_positions/new_models/sign2.model"
+		: "objects/pavel3333_positions/models/lod0/sign2.model"; 
 
 	superExtendedDebugLog("lighting: [");
 
@@ -637,11 +630,10 @@ uint8_t create_models() { traceLog
 
 				superExtendedDebugLog("[");
 #if CREATE_MODELS
-				models[counter_model] = new ModModel;
-
-				models[counter_model]->coords    = *it;
-				models[counter_model]->model     = pos_model(lighting_path, *it);
-				models[counter_model]->processed = false;
+				models[counter_model] = new ModModel {
+					lighting_path,
+					*it
+				};
 #endif
 
 #if CREATE_LIGHTS
@@ -660,21 +652,12 @@ uint8_t create_models() { traceLog
 
 	superExtendedDebugLog("], ");
 
-	delete[] lighting_path;
-
 	//LFD section
 
-	size = 54;
 
-	if (isNewModels) size = 53;
-
-	char* LFD_path = new char[size];
-	if (isNewModels) memcpy(LFD_path, "\x6f\xd\x67\x2\x61\x15\x66\x49\x39\x58\x2e\x4b\x27\x14\x27\x14\x27\x78\x8\x67\x14\x7d\x9\x60\xf\x61\x12\x3d\x53\x36\x41\x1e\x73\x1c\x78\x1d\x71\x2\x2d\x5e\x37\x50\x3e\xd\x23\x4e\x21\x45\x20\x4c\x4c", size - 1);
-	else             memcpy(LFD_path, "\x6F\xD\x67\x2\x61\x15\x66\x49\x39\x58\x2E\x4B\x27\x14\x27\x14\x27\x78\x8\x67\x14\x7D\x9\x60\xF\x61\x12\x3D\x50\x3F\x5B\x3E\x52\x21\xE\x62\xD\x69\x59\x76\x5\x6C\xB\x65\x56\x78\x15\x7A\x1E\x7B\x17\x17", size - 1);
-
-	for (uint8_t i = size - 2; i > NULL; i--) {
-		LFD_path[i] = LFD_path[i] ^ LFD_path[i - 1];
-	}
+	char* LFD_path = isNewModels
+		? "objects/pavel3333_positions/new_models/sign3.model"
+		: "objects/pavel3333_positions/models/lod0/sign3.model";
 
 	superExtendedDebugLog("LFD: [");
 
@@ -692,11 +675,10 @@ uint8_t create_models() { traceLog
 
 				superExtendedDebugLog("[");
 #if CREATE_MODELS
-				models[counter_model] = new ModModel;
-
-				models[counter_model]->coords    = *it;
-				models[counter_model]->model     = pos_model(LFD_path, *it);
-				models[counter_model]->processed = false;
+				models[counter_model] = new ModModel {
+					LFD_path,
+					*it
+				};
 #endif
 
 #if CREATE_LIGHTS
@@ -714,8 +696,6 @@ uint8_t create_models() { traceLog
 	}
 
 	superExtendedDebugLog("], ");
-
-	delete[] LFD_path;
 
 	debugLog("creating OK!");
 
@@ -758,7 +738,8 @@ uint8_t init_models() { traceLog
 	Py_DECREF(spaceID_py);
 
 	for (uint8_t i = NULL; i < current_map.getTotalCount(); i++) {
-		if (models[i] == nullptr) continue;
+		if (models[i] == nullptr)
+			continue;
 
 		if (models[i]->model == Py_None || !models[i]->model || models[i]->processed) {
 			traceLog

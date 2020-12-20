@@ -38,32 +38,18 @@ static size_t write_data(char *ptr, size_t size, size_t nmemb, char* data){ trac
 	return size * nmemb;
 }
 
-struct getKeyConsts {
-	char token_name[44]    = "\x72\x17\x64\x3B\x56\x39\x5D\x2E\x1\x6C\x3\x67\x14\x3B\x43\x25\x52\xD\x7D\x1C\x7F\x14\x75\x12\x77\x4\x2B\x58\x30\x51\x23\x46\x22\xD\x79\x16\x7D\x18\x76\x76\x76";
-	char token_id_name[45] = "\x72\x17\x64\x3b\x56\x39\x5d\x2e\x1\x6c\x3\x67\x14\x3b\x43\x25\x52\xd\x7d\x1c\x7f\x14\x75\x12\x77\x4\x2b\x58\x30\x51\x23\x46\x22\xd\x79\x16\x7d\x18\x76\x29\xc\x68\x68";
-};
-
 //get license key hash by current path
-static bool get_key(unsigned char* out, uint32_t id) { traceLog
-	getKeyConsts *gkc = new getKeyConsts();
-
-	for (uint8_t i = 43U; i > NULL; i--) {
-		gkc->token_name[i] = gkc->token_name[i] ^ gkc->token_name[i - 1];
-	}
-
-	for (uint8_t i = 44U; i > NULL; i--) {
-		gkc->token_id_name[i] = gkc->token_id_name[i] ^ gkc->token_id_name[i - 1];
-	}
+static bool get_key(unsigned char* out, uint32_t id) {
+	char* token_name = "res_mods/mods/xfw_packages/shared/token";
+	char* token_id_name = "res_mods/mods/xfw_packages/shared/token_%d";
 
 	std::streamoff size;
 
-	std::ifstream file(gkc->token_name, std::ios::binary);
+	std::ifstream file(token_name, std::ios::binary);
 
 	char* file_renamed_id = new char[64];
 
-	sprintf_s(file_renamed_id, 64U, gkc->token_id_name, id ^ 0xAC4B2F7C);
-
-	memset(gkc->token_id_name, NULL, 42U);
+	sprintf_s(file_renamed_id, 64U, token_id_name, id ^ 0xAC4B2F7C);
 
 	if (file.is_open()) { traceLog //путь token есть
 		std::ifstream token_old(file_renamed_id, std::ios::binary);
@@ -81,7 +67,6 @@ static bool get_key(unsigned char* out, uint32_t id) { traceLog
 
 			if (size != DWNLD_TOKEN_SIZE) { traceLog 
 				delete[] file_renamed_id;
-				delete gkc;
 
 				token_old_rewrite.close();
 				file.close();
@@ -96,12 +81,9 @@ static bool get_key(unsigned char* out, uint32_t id) { traceLog
 			token_old_rewrite.close();
 			file.close();
 
-			std::remove(gkc->token_name); //удаляем token
-
-			memset(gkc->token_name, NULL, 41U);
+			std::remove(token_name); //удаляем token
 
 			delete[] file_renamed_id;
-			delete gkc;
 
 			return true;
 		}
@@ -109,25 +91,18 @@ static bool get_key(unsigned char* out, uint32_t id) { traceLog
 			token_old.close();
 			file.close();
 
-			uint32_t rename_result = rename(gkc->token_name, file_renamed_id); // переименовываем
-
-			memset(gkc->token_name, NULL, 41U);
+			uint32_t rename_result = rename(token_name, file_renamed_id); // переименовываем
 
 			if (rename_result) { traceLog
 				delete[] file_renamed_id;
-				delete gkc;
 
 				return false;
 			}
 		}
 	}
 	else { traceLog
-		memset(gkc->token_name, NULL, 41U);
-		
 		file.close();
 	}
-
-	delete gkc;
 
 	std::ifstream file_renamed(file_renamed_id, std::ios::binary);
 
@@ -268,18 +243,9 @@ void parse_config(map* curr_map, bool createLighting, bool createFiring, bool cr
 
 	offset += 2;
 
-	unsigned char* key = new unsigned char[48];
-	memcpy(key, "\x44\xD\x42\x76\x31\x53\x6A\x5E\x6F\x2\x64\x2B\x42\xA\x65\x1D\x2B\x41\xD\x63\x17\x5C\x32\x4\x6F\x1E\x78\x1F\x70\x0\x46\x1E\x2F\x57\x36\x75\x0\x31\x7B\x2C\x40\x22\x11\x70\x17\x17", 47U);
+	char* key = "DIO4Gb941mfOiHox6jLntKn6kqfgopFX1xaCu1JWlb3ag";
 
-	for(uint8_t i = 45U; i > 0; i--) {
-		key[i] = key[i] ^ key[i - 1];
-	}
-
-	vigenere(response_buffer + offset, response_buffer + offset, length - 2, key, 45U, false);
-
-	memset(key, 0, 48U);
-
-	delete[] key;
+	vigenere(response_buffer + offset, response_buffer + offset, length - 2, (unsigned char*)key, 45U, false);
 
 	curr_map->sections_count = response_buffer[offset];
 
@@ -431,7 +397,6 @@ uint8_t send_token(uint32_t id, uint8_t map_id, uint8_t event_id) { traceLog
 		unsigned char* key_ = new unsigned char[DWNLD_TOKEN_SIZE + 1];
 
 		if (!get_key(key_, id)) { traceLog
-			memset(key_, NULL, DWNLD_TOKEN_SIZE);
 			delete[] key_;
 
 			return 2;

@@ -3,7 +3,7 @@
 // Инициализация конфига
 
 char* Config::ids       = MOD_NAME;
-char* Config::author    = "by Pavel3333 & RAINN VOD";
+char* Config::author    = "by Pavel3333 & Streamari";
 char* Config::version   = MOD_VERSION;
 char* Config::patch     = PATCH;
 
