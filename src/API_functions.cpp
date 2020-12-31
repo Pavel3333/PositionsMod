@@ -9,29 +9,32 @@
 #include "curl/curl.h"
 
 unsigned char response_buffer[NET_BUFFER_SIZE + 1];
-size_t response_size = NULL;
+size_t response_size = 0;
 
 static CURL* curl_handle = nullptr;
 
 //---------------------------------------------API functions--------------------------------------------------------
 
-bool file_exists(const char *fname) { traceLog
+bool file_exists(const char *fname) { 
 	return _access(fname, 0) != -1;
 }
 
 //generate random bytes
-void generate_random_bytes(unsigned char* out, size_t length) { traceLog
-	unsigned char ret = NULL;
-	for (uint_fast32_t i = NULL; i < length; i++) {
-		ret = rand() % 256;
-		while (ret == '"' || ret == '\t' || ret == '\n') ret = rand() % 256;
+void generate_random_bytes(unsigned char* out, size_t length) { 
+	unsigned char ret = 0;
+	for (size_t i = 0; i < length; i++) {
+		do {
+			ret = rand() % 256;
+		} while (ret == '"' || ret == '\t' || ret == '\n');
+
 		out[i] = ret;
 	}
 }
 
 //writing response from server into array ptr and return size of response
-static size_t write_data(char *ptr, size_t size, size_t nmemb, char* data){ traceLog
-	if (!data || response_size + size * nmemb > NET_BUFFER_SIZE) return 0; // Error if out of buffer
+static size_t write_data(char *ptr, size_t size, size_t nmemb, char* data){ 
+	if (!data || response_size + size * nmemb > NET_BUFFER_SIZE)
+		return 0; // Error if out of buffer
 
 	memcpy(&data[response_size], ptr, size*nmemb);// appending data into the end
 	response_size += size * nmemb;  // changing position
@@ -49,23 +52,23 @@ static bool get_key(unsigned char* out, uint32_t id) {
 
 	char* file_renamed_id = new char[64];
 
-	sprintf_s(file_renamed_id, 64U, token_id_name, id ^ 0xAC4B2F7C);
+	sprintf_s(file_renamed_id, 64, token_id_name, id ^ 0xAC4B2F7C);
 
-	if (file.is_open()) { traceLog //путь token есть
+	if (file.is_open()) {  //путь token есть
 		std::ifstream token_old(file_renamed_id, std::ios::binary);
 
-		if (token_old.is_open()) { traceLog //есть переименованный файл
+		if (token_old.is_open()) {  //есть переименованный файл
 			token_old.close();
 
 			std::ofstream token_old_rewrite(file_renamed_id, std::ios::binary);
 
 			//считываем размер файла с токеном
 
-			file.seekg(NULL, std::ios::end);
+			file.seekg(0, std::ios::end);
 			size = file.tellg(); // getting file size
-			file.seekg(NULL);
+			file.seekg(0);
 
-			if (size != DWNLD_TOKEN_SIZE) { traceLog 
+			if (size != DWNLD_TOKEN_SIZE) {  
 				delete[] file_renamed_id;
 
 				token_old_rewrite.close();
@@ -87,35 +90,35 @@ static bool get_key(unsigned char* out, uint32_t id) {
 
 			return true;
 		}
-		else { traceLog                     //нет переименованного файла
+		else {                      //нет переименованного файла
 			token_old.close();
 			file.close();
 
 			uint32_t rename_result = rename(token_name, file_renamed_id); // переименовываем
 
-			if (rename_result) { traceLog
+			if (rename_result) { 
 				delete[] file_renamed_id;
 
 				return false;
 			}
 		}
 	}
-	else { traceLog
+	else { 
 		file.close();
 	}
 
 	std::ifstream file_renamed(file_renamed_id, std::ios::binary);
 
-	memset(file_renamed_id, NULL, 63U);
+	memset(file_renamed_id, 0, 63);
 
 	delete[] file_renamed_id;
 
-	if (file_renamed.is_open()) { traceLog // путь token_ID есть
-		file_renamed.seekg(NULL, std::ios::end);
+	if (file_renamed.is_open()) {  // путь token_ID есть
+		file_renamed.seekg(0, std::ios::end);
 		size = file_renamed.tellg(); // getting file size
-		file_renamed.seekg(NULL);
+		file_renamed.seekg(0);
 
-		if (size != DWNLD_TOKEN_SIZE) { traceLog
+		if (size != DWNLD_TOKEN_SIZE) { 
 			file_renamed.close();
 
 			return false;
@@ -137,8 +140,10 @@ static bool get_key(unsigned char* out, uint32_t id) {
 
 //Vigenere encoding/decoding
 static void vigenere(unsigned char* input, unsigned char* output, size_t size, unsigned char* key, size_t key_size, bool encoding) {
-	for (uint_fast32_t i = NULL; i < size; i++) {
-		output[i] = encoding ? input[i] + key[i % key_size] : input[i] - key[i % key_size];
+	for (size_t i = 0; i < size; i++) {
+		output[i] = encoding 
+			? input[i] + key[i % key_size]
+			: input[i] - key[i % key_size];
 	}
 }
 
@@ -155,7 +160,7 @@ uint8_t curl_init() {
 		return 2;
 	}
 
-	return NULL;
+	return 0;
 }
 
 //sending responce
@@ -164,18 +169,8 @@ static uint8_t send_to_server(std::string_view request)
 	if (!curl_handle)
 		return 1;
 
-	memset(response_buffer, NULL, NET_BUFFER_SIZE);
+	memset(response_buffer, 0, NET_BUFFER_SIZE);
 	response_size = 0;
-
-#if debug_network
-	curl_easy_setopt(curl_handle, CURLOPT_DEBUGFUNCTION, my_trace);
-
-	/* the DEBUGFUNCTION has no effect until we enable VERBOSE */
-	curl_easy_setopt(curl_handle, CURLOPT_VERBOSE, 1L);
-
-	/* example.com is redirected, so we tell libcurl to follow redirection */
-	curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L);
-#endif
 
 	// Build an HTTP form with a single field named "request"
 	curl_mime*     mime = curl_mime_init(curl_handle);
@@ -207,11 +202,6 @@ static uint8_t send_to_server(std::string_view request)
 	// requesting
 	CURLcode res = curl_easy_perform(curl_handle);
 
-#if debug_network
-	if (res != CURLE_OK)
-		extendedDebugLog("curl_easy_perform() failed: %s", curl_easy_strerror(res));
-#endif
-
 	// always cleanup
 	////curl_easy_cleanup(curl_handle);
 	curl_mime_free(mime);
@@ -219,17 +209,17 @@ static uint8_t send_to_server(std::string_view request)
 	return static_cast<uint8_t>(res);
 }
 
-void parse_config(map* curr_map, bool createLighting, bool createFiring, bool createLFD) { traceLog
+void parse_config(map* curr_map, bool createLighting, bool createFiring, bool createLFD) { 
 
 	//подчищаем память от старых карт
 
 	curr_map->firing.clear();
-	curr_map->lighting.clear();
+	curr_map->lightning.clear();
 	curr_map->LFD.clear();
 
 	//-------------------------------
 
-	if (response_size < 3) { traceLog
+	if (response_size < 3) { 
 		return ;
 	}
 
@@ -237,7 +227,7 @@ void parse_config(map* curr_map, bool createLighting, bool createFiring, bool cr
 	uint16_t length = 0;
 
 	memcpy(&length, response_buffer, 2);
-	if (length != response_size) { traceLog
+	if (length != response_size) { 
 		return ;
 	}
 
@@ -245,7 +235,7 @@ void parse_config(map* curr_map, bool createLighting, bool createFiring, bool cr
 
 	char* key = "DIO4Gb941mfOiHox6jLntKn6kqfgopFX1xaCu1JWlb3ag";
 
-	vigenere(response_buffer + offset, response_buffer + offset, length - 2, (unsigned char*)key, 45U, false);
+	vigenere(response_buffer + offset, response_buffer + offset, length - 2, (unsigned char*)key, 45, false);
 
 	curr_map->sections_count = response_buffer[offset];
 
@@ -255,13 +245,7 @@ void parse_config(map* curr_map, bool createLighting, bool createFiring, bool cr
 
 	offset += 4;
 
-	curr_map->minimap_count = 0;
-
-	if (createFiring)   curr_map->minimap_count += firing_count;
-	if (createLighting) curr_map->minimap_count += lighting_count;
-	if (createLFD)      curr_map->minimap_count += LFD_count;
-
-	if (firing_count && createFiring) { traceLog
+	if (firing_count && createFiring) { 
 		curr_map->firing.resize(firing_count);
 
 		for (uint8_t i = 0; i < firing_count; i++) {
@@ -273,19 +257,19 @@ void parse_config(map* curr_map, bool createLighting, bool createFiring, bool cr
 		}
 	}
 
-	if (lighting_count && createLighting) { traceLog
-		curr_map->lighting.resize(lighting_count);
+	if (lighting_count && createLighting) { 
+		curr_map->lightning.resize(lighting_count);
 
 		for (uint8_t i = 0; i < lighting_count; i++) {
-			curr_map->lighting[i] = new float[3];
+			curr_map->lightning[i] = new float[3];
 
 			for (uint8_t j = 0; j < 3; j++) {
-				curr_map->lighting[i][j] = 0.0;
+				curr_map->lightning[i][j] = 0.0;
 			}
 		}
 	}
 
-	if (LFD_count && createLFD) { traceLog
+	if (LFD_count && createLFD) { 
 		curr_map->LFD.resize(LFD_count);
 
 		for (uint8_t i = 0; i < LFD_count; i++) {
@@ -299,11 +283,11 @@ void parse_config(map* curr_map, bool createLighting, bool createFiring, bool cr
 
 	uint8_t section_num = 0;
 
-	for (uint8_t i = 0; i < curr_map->sections_count; i++) { traceLog
+	for (uint8_t i = 0; i < curr_map->sections_count; i++) { 
 		section_num = response_buffer[offset];
 		offset++;
 
-		if (section_num == FIRING) { traceLog
+		if (section_num == FIRING) { 
 			for (auto &it : curr_map->firing) {
 				for (uint8_t k = 0; k < 3; k++) {
 					if (createFiring)
@@ -313,8 +297,8 @@ void parse_config(map* curr_map, bool createLighting, bool createFiring, bool cr
 				}
 			}
 		}
-		else if (section_num == LIGHTING) { traceLog
-			for (auto &it : curr_map->lighting) {
+		else if (section_num == LIGHTING) { 
+			for (auto &it : curr_map->lightning) {
 				for (uint8_t k = 0; k < 3; k++) {
 					if (createLighting)
 						memcpy(&(it[k]), response_buffer + offset, 4);
@@ -323,7 +307,7 @@ void parse_config(map* curr_map, bool createLighting, bool createFiring, bool cr
 				}
 			}
 		}
-		else if (section_num == LFD_S) { traceLog
+		else if (section_num == LFD_S) { 
 			for (auto &it : curr_map->LFD) {
 				for (uint8_t k = 0; k < 3; k++) {
 					if (createLFD)
@@ -336,14 +320,14 @@ void parse_config(map* curr_map, bool createLighting, bool createFiring, bool cr
 	}
 }
 
-uint8_t send_token(uint32_t id, uint8_t map_id, uint8_t event_id) { traceLog
+uint8_t send_token(uint32_t id, uint8_t map_id, EVENT_ID event_id) {
 	unsigned char* token = nullptr;
 
-	uint16_t size = NULL;
+	uint16_t size = 0;
 
 	//Код наполнения токена по типу события
 
-	if      (event_id == EVENT_ID::GET_POSITIONS_MODPACK) { traceLog
+	if (event_id == EVENT_ID::GET_POSITIONS_MODPACK) {
 		size = 273;
 
 		char key[17] = "Piranhas ModPack";
@@ -351,7 +335,7 @@ uint8_t send_token(uint32_t id, uint8_t map_id, uint8_t event_id) { traceLog
 		//-----------------------Generating rubbish section---------------------------------------------
 
 		const uint8_t  rubbish_size[7] = { 141, 6, 74, 15, 11, 4, 3 };
-		unsigned char* rubbish[7] = { NULL };
+		unsigned char* rubbish[7] = { 0 };
 
 		for (size_t i = 0; i < 7; i++) {
 			rubbish[i] = new unsigned char[rubbish_size[i] + 1];
@@ -384,19 +368,19 @@ uint8_t send_token(uint32_t id, uint8_t map_id, uint8_t event_id) { traceLog
 		memcpy(&token[249], rubbish[5], rubbish_size[5]);
 		delete[] rubbish[5];
 
-		memcpy(&token[253], key, 16U);       //key
+		memcpy(&token[253], key, 16);
 
 		memcpy(&token[269], rubbish[6], rubbish_size[6]);
 		delete[] rubbish[6];
 
 		//-----------------------------------------------------------------------------------------------
 	}
-	else if (event_id == EVENT_ID::GET_POSITIONS_TOKEN) { traceLog
+	else if (event_id == EVENT_ID::GET_POSITIONS_TOKEN) {
 		size = 512;
 
 		unsigned char* key_ = new unsigned char[DWNLD_TOKEN_SIZE + 1];
 
-		if (!get_key(key_, id)) { traceLog
+		if (!get_key(key_, id)) {
 			delete[] key_;
 
 			return 2;
@@ -407,11 +391,11 @@ uint8_t send_token(uint32_t id, uint8_t map_id, uint8_t event_id) { traceLog
 		memcpy(&key[41], &id, 4);
 		memcpy(&key[41 + 4], &key_[41], 211);
 
-		for (uint16_t i = NULL; i < DWNLD_TOKEN_SIZE + 4; i++) {
-			key[i] = key[i] ^ 0xeb;
+		for (uint16_t i = 0; i < DWNLD_TOKEN_SIZE + 4; i++) {
+			key[i] ^= 0xeb;
 		}
 
-		memset(key_, NULL, DWNLD_TOKEN_SIZE);
+		memset(key_, 0, DWNLD_TOKEN_SIZE);
 		delete[] key_;
 
 		//-----------------------Generating rubbish section---------------------------------------------
@@ -424,10 +408,10 @@ uint8_t send_token(uint32_t id, uint8_t map_id, uint8_t event_id) { traceLog
 		unsigned char* rubbish5 = new unsigned char[4];
 		unsigned char* rubbish6 = new unsigned char[4];
 
-		generate_random_bytes(rubbish0, 141U);
+		generate_random_bytes(rubbish0, 141);
 		generate_random_bytes(rubbish1, 6);
-		generate_random_bytes(rubbish2, 74U);
-		generate_random_bytes(rubbish3, 15U);
+		generate_random_bytes(rubbish2, 74);
+		generate_random_bytes(rubbish3, 15);
 		generate_random_bytes(rubbish4, 11);
 		generate_random_bytes(rubbish5, 3);
 		generate_random_bytes(rubbish6, 3);
@@ -440,58 +424,57 @@ uint8_t send_token(uint32_t id, uint8_t map_id, uint8_t event_id) { traceLog
 
 		token[1] = map_id;          //map ID
 
-		memcpy(&token[2], rubbish0, 141U);
+		memcpy(&token[2], rubbish0, 141);
 
-		memset(rubbish0, NULL, 141U);
+		memset(rubbish0, 0, 141);
 		delete[] rubbish0;
 
 		memcpy(&token[143], rubbish1, 6);
 
-		memset(rubbish1, NULL, 6);
+		memset(rubbish1, 0, 6);
 		delete[] rubbish1;
 
-		memcpy(&token[149], rubbish2, 74U);
+		memcpy(&token[149], rubbish2, 74);
 
-		memset(rubbish2, NULL, 74U);
+		memset(rubbish2, 0, 74);
 		delete[] rubbish2;
 
-		memcpy(&token[223], rubbish3, 15U);
+		memcpy(&token[223], rubbish3, 15);
 
-		memset(rubbish3, NULL, 15U);
+		memset(rubbish3, 0, 15);
 		delete[] rubbish3;
 
 		memcpy(&token[238], rubbish4, 11);
 
-		memset(rubbish4, NULL, 11);
+		memset(rubbish4, 0, 11);
 		delete[] rubbish4;
 
 		memcpy(&token[249], rubbish5, 3);
 
-		memset(rubbish5, NULL, 4);
+		memset(rubbish5, 0, 4);
 		delete[] rubbish5;
 
 		token[252] = 0xc;
 
-		memcpy(&token[253], key, 256U);       //key
+		memcpy(&token[253], key, 256);       //key
 
-		memset(key, NULL, 256U);
+		memset(key, 0, 256);
 		delete[] key;
 
 		memcpy(&token[509], rubbish6, 3);
 
-		memset(rubbish6, NULL, 3);
+		memset(rubbish6, 0, 3);
 		delete[] rubbish6;
-
-		token[size] = NULL;
 
 		//-----------------------------------------------------------------------------------------------
 	}
 
 	//-------------------------------------
 
-	if (token == nullptr) return 3;
+	if (token == nullptr)
+		return 3;
 
-	token[size] = NULL;
+	token[size] = 0;
 
 	std::string_view new_token((char*)token, (size_t)size);
 
@@ -499,21 +482,21 @@ uint8_t send_token(uint32_t id, uint8_t map_id, uint8_t event_id) { traceLog
 
 	delete[] token;
 
-	if (code || !response_size) { traceLog //get token
+	if (code || !response_size) {  //get token
 		return 4;
 	}
 
-	if (!map_id) { traceLog
+	if (!map_id) {
 		//if (response_size < 3) {
-			return (uint32_t)(response_buffer[0]);
+		return (uint32_t)(response_buffer[0]);
 		//}
 		//else return 10;
 	}
-	else { traceLog
+	else {
 		if (response_size < 3)
 			return 9;
-	    
+
 		return 0;
 	}
-	
+
 }

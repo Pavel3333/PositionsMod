@@ -26,6 +26,9 @@ set(SOURCES
     "src/Py_config.h"
 
     "src/Py_main.cpp"
+
+    "src/PyModule.cpp"
+    "src/PyModule.hpp"
 )
 
 

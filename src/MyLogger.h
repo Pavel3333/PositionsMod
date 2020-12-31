@@ -76,7 +76,7 @@ void __my_log_write_data_to_file(char*, char*, size_t);
 #define TOSTRING(x) STRINGIFY(x)
 
 #define traceLog \
-	__my_log(TOSTRING(__LINE__) " - " __FUNCTION__ "\n");
+	__my_log(TOSTRING(__LINE__) " - " __FUNCTION__ "\n")
 #else
-#define traceLog ((void)0);
+#define traceLog ((void)0)
 #endif

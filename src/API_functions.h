@@ -12,8 +12,8 @@
 #define LIGHTING (1)
 #define LFD_S (2)
 
-enum EVENT_ID {
-	GET_POSITIONS_TOKEN = 0,
+enum class EVENT_ID {
+	GET_POSITIONS_TOKEN,
 	GET_POSITIONS_MODPACK
 };
 
@@ -27,16 +27,15 @@ enum MOD_ID {
 
 typedef struct _map {
 	uint8_t sections_count = 0; //now it is 6 anywhere but I do that field for future updates of structure
-	uint8_t minimap_count  = 0;
 
 	//types of positions sections
 
 	std::vector<float*> firing;
-	std::vector<float*> lighting;
+	std::vector<float*> lightning;
 	std::vector<float*> LFD;
 
 	size_t getTotalCount() {
-		return firing.size() + lighting.size() + LFD.size();
+		return firing.size() + lightning.size() + LFD.size();
 	}
 } map;
 
@@ -49,4 +48,4 @@ void parse_config(map*, bool, bool, bool);
 
 bool file_exists(const char*);
 
-uint8_t send_token(uint32_t, uint8_t, uint8_t);
+uint8_t send_token(uint32_t, uint8_t, EVENT_ID);
