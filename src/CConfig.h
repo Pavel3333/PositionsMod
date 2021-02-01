@@ -4,7 +4,7 @@
 
 #include "pch.h"
 
-#define PATCH       "1.11.1.0"
+#define PATCH       "1.11.1.1"
 #define MOD_VERSION "v2.1.0.0 (" __TIMESTAMP__ ") - patch " PATCH
 
 struct data_c {

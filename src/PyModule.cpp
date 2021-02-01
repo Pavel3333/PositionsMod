@@ -602,44 +602,42 @@ uint8_t init_models()
 
 		Py_INCREF(models[i]->model);
 
-		PyObject* clipResource;
+		if (PyObject_HasAttrString(models[i]->model, "deprecatedGetAnimationClipResource")) {
+			if (PyObject* clipResource = PyObject_CallMethod(models[i]->model, "deprecatedGetAnimationClipResource", "s", "rotation")) {
+				if (PyObject* loader = PyObject_CallMethod(AnimationSequence, "Loader", "Ol", clipResource, spaceID)) {
+					if (PyObject* animator = PyObject_CallMethod(loader, "loadSync", NULL)) {
+						if (PyObject* binder = PyObject_CallMethod(AnimationSequence, "ModelWrapperContainer", "Ol", models[i]->model, spaceID)) {
+							PyObject* __bindTo = PyString_FromString("bindTo");
 
-		if (PyObject_HasAttrString(models[i]->model, "deprecatedGetAnimationClipResource") &&
-			PyObject_CallMethod(models[i]->model, "deprecatedGetAnimationClipResource", "s", "rotation")
-		) {
-			if (PyObject* loader = PyObject_CallMethod(AnimationSequence, "Loader", "Ol", clipResource, spaceID)) {
-				if (PyObject* animator = PyObject_CallMethod(loader, "loadSync", NULL)) {
-					if (PyObject* binder = PyObject_CallMethod(AnimationSequence, "ModelWrapperContainer", "Ol", models[i]->model, spaceID)) {
-						PyObject* __bindTo = PyString_FromString("bindTo");
+							Py_INCREF(animator);
 
-						Py_INCREF(animator);
+							if (PyObject* res = PyObject_CallMethodObjArgs(animator, __bindTo, binder, NULL))
+								Py_DECREF(res);
 
-						if (PyObject* res = PyObject_CallMethodObjArgs(animator, __bindTo, binder, NULL))
-							Py_DECREF(res);
+							Py_DECREF(animator);
+
+							Py_DECREF(__bindTo);
+
+							Py_INCREF(animator);
+
+							if (PyObject* res = PyObject_CallMethod(animator, "start", NULL))
+								Py_DECREF(res);
+
+							Py_DECREF(animator);
+
+							models[i]->animator = animator;
+
+							Py_DECREF(binder);
+						}
 
 						Py_DECREF(animator);
-
-						Py_DECREF(__bindTo);
-
-						Py_INCREF(animator);
-
-						if (PyObject* res = PyObject_CallMethod(animator, "start", NULL))
-							Py_DECREF(res);
-
-						Py_DECREF(animator);
-
-						models[i]->animator = animator;
-
-						Py_DECREF(binder);
 					}
 
-					Py_DECREF(animator);
+					Py_DECREF(loader);
 				}
 
-				Py_DECREF(loader);
+				Py_DECREF(clipResource);
 			}
-
-			Py_DECREF(clipResource);
 		}
 
 		Py_DECREF(models[i]->model);
