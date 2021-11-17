@@ -1,5 +1,9 @@
 ﻿#pragma once
 
+#include "include/BinaryStream/bstream.hpp"
+
+#include <sstream>
+
 #define debug_log                true
 #define extended_debug_log       true
 #define super_extended_debug_log false
@@ -19,7 +23,7 @@ void __my_log_c(char);
 void __my_log_fmt(char*, const char*, bool timed, ...);
 void __my_log_fmt_with_pystdout(char*, const char*, bool timed, ...);
 
-void __my_log_write_data_to_file(char*, char*, size_t);
+void __my_log_write_data_to_file(char*, bstream&);
 
 #define debugLog(fmt, ...) debugLogEx(INFO, fmt, ##__VA_ARGS__)
 #define debugLogRaw(fmt, ...) debugLogRawEx(fmt, ##__VA_ARGS__)
@@ -41,7 +45,7 @@ void __my_log_write_data_to_file(char*, char*, size_t);
 	__my_log_fmt(__log_buf_private, "[" MOD_NAME "][" #level "]: " fmt "\n", true, ##__VA_ARGS__)
 #define extendedDebugLogRawEx(fmt, ...) \
 	__my_log_fmt(__log_buf_private, fmt, false, ##__VA_ARGS__)
-#define writeDebugDataToFile(name, data, size) __my_log_write_data_to_file(#name, data, size)
+#define writeDebugDataToFile(name, dataStream) __my_log_write_data_to_file(#name, dataStream)
 
 #if super_extended_debug_log
 #define superExtendedDebugLogEx(level, fmt, ...) \
